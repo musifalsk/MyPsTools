@@ -1,6 +1,18 @@
+<#
+.SYNOPSIS
+    Set-AzContext for Powershell module & az login with az cli
+.DESCRIPTION
+    This function will set the Azure context for both Powershell module and az cli.
+    If the Powershell module is not logged in, it will open a login page for the Powershell module.
+    If the az cli is not logged in, it will open a login page for the az cli.
+    If the -Show switch is used, it will show the current logged in account for both Powershell module and az cli.
+.NOTES
+    This function requires the Az module and the Az CLI to be installed.
+.EXAMPLE
+    Set-AzureSubscription
+    Set-AzureSubscription -Show
+#>
 
-
-# Set-AzContext for Powershell module & az login with az cli
 function Set-AzureSubscription {
     [Alias('EzAzLogin', 'Switch-AzureSubscription')]
     [CmdletBinding(SupportsShouldProcess = $true)]
@@ -29,13 +41,3 @@ function Set-AzureSubscription {
     Write-Output "$($green)Logged in Ps Account: $((Get-AzContext).Subscription.Name)$($white)"
     Write-Output "$($green)Logged in Cli Account: $((az account show --query 'name') -replace '\"')$($white)"
 }
-
-<#
-Get-AzTenant
-Get-AzRoleEligibilitySchedule -Scope '/' -Filter 'asTarget()'
-Get-AzSubscription
-Select-AzSubscription -SubscriptionObject $sub[-3]
-Get-AzContext -ListAvailable
-Clear-AzContext -Force
-az account clear
-#>

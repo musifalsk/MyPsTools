@@ -1,4 +1,13 @@
-
+<#
+.SYNOPSIS
+    Removes old versions of installed PowerShell modules.
+.DESCRIPTION
+    This function will remove all but the latest version of installed PowerShell modules.
+    It will also remove the module from the current session if it is loaded.
+.EXAMPLE
+    Remove-OldPsModuleVersions
+    Remove-OldPsModuleVersions -DryRun
+#>
 
 # Remove Old PSModuleVersions
 function Remove-OldPsModuleVersions {

@@ -1,14 +1,11 @@
 ﻿<#
 .SYNOPSIS
     Scans the selected ports / portranges towards the hostname(s) you provide
-
 .DESCRIPTION
-    https://github.com/equinor/ideation-machine-infra/wiki/IM-Toolbox
-    Scans the selected ports / portranges on the hostname(s)
-
+    This function will test the selected ports / portranges towards the hostname(s) you provide.
+    It will output the result to the screen and optionally export the result to an HTML file.
 .NOTES
     Faster than using Test-NetConnection
-
 .EXAMPLE
     Test-Ports -hostname 'nrk.no','vg.no','google.com'-ports 80,81,443,444 -timeout 500
 #>

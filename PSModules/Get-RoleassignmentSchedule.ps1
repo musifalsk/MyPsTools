@@ -1,5 +1,3 @@
-# Requires -Modules Az.Accounts, Az.Resources, Microsoft.PowerShell.ConsoleGuiTools
-
 <#
 .SYNOPSIS
     Check if your PIM is still active

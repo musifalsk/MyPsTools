@@ -1,5 +1,13 @@
+<#
+.SYNOPSIS
+    Update all existing PSModules to the latest version.
+.DESCRIPTION
+    This function will update all installed PowerShell modules to the latest version.
+.EXAMPLE
+    Test-MyTestFunction -Verbose
+    Explanation of the function or its result. You can include multiple examples with additional .EXAMPLE lines
+#>
 
-# Update all existing PSModules
 function Update-PSModules {
     [CmdletBinding(SupportsShouldProcess = $true)]
     param ([switch]$DiffCheck)
@@ -39,13 +47,3 @@ function Update-PSModules {
         }
     }
 }
-
-
-<#
-Get-Job -Name 'Update*' | Select-Object Id, Name, State, HasMoreData
-Receive-Job * -keep
-Remove-Job -State Completed
-Get-Job -Name 'Update*' -IncludeChildJob
-Get-Job -Name 'Update*' -IncludeChildJob | ForEach-Object { Receive-Job -Id $_.Id -Keep }
-Update-PSModules
-#>

@@ -1,19 +1,14 @@
 ﻿<#
 .SYNOPSIS
     Returns the geographic location and more for a Dns or Ip
-
 .DESCRIPTION
-    https://github.com/equinor/ideation-machine-infra/wiki/IM-Toolbox
     This function will lookup a Dns or Ip address and show you information
     like country, region, city, organization, isp and more
-
 .NOTES
     Provider allows 15 requests per minute from the same IP, but the script
     will send 100 entries on each request for a total of 1500.
-
 .LINK
     This function use https://ip-api.com website for its lookups.
-
 .EXAMPLE
     Get-GeoLocation 'vg.no'
     '8.8.8.8' | Get-GeoLocation
@@ -23,7 +18,6 @@
 Function Get-GeoLocation {
     [CmdletBinding(DefaultParameterSetName = 'Parameter Set 1')]
     [Alias('geoloc')]
-
     param(
         [Parameter(
             ValueFromPipeline = $true,
@@ -34,9 +28,7 @@ Function Get-GeoLocation {
     )
 
     begin {
-        if (!($HostName)) {
-            Write-Verbose 'Looking for hostnames in the pipeline'
-        }
+        if (!($HostName)) { Write-Verbose 'Looking for hostnames in the pipeline' }
         $c = 0
         $ip = @()
     }

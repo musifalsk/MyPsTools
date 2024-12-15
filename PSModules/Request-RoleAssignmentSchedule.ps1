@@ -1,19 +1,18 @@
-# Requires -Modules Az.Accounts, Az.Resources, Microsoft.PowerShell.ConsoleGuiTools
 <#
 .SYNOPSIS
     Sends a request to activate a role in Privileged Identity Management.
 .DESCRIPTION
     Use this funtion instead of the portal when you want to elevate your Owner / Contributor role in the Privileged Identity Management.
     If your PIM is already active it will automatically extend the duration instead.
+
+    Parameters:
+        -Justification = Message to explain your purpose ,
+        -Duration = The duration of the PIM (must be in whole hours. ex: 3 for three hours),
 .NOTES
     Make sure that you are logged into the tenant (Set-AzContext) before running this script.
 .EXAMPLE
     Activate-PIM
     PIM -Justification 'Testing' -Duration 3
-
-    Parameters:
-        -Justification = Message to explain your purpose ,
-        -Duration = The duration of the PIM (must be in whole hours. ex: 3 for three hours),
 #>
 
 function Request-RoleAssignmentSchedule {
