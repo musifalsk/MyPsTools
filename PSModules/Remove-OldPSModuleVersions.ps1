@@ -6,6 +6,7 @@
     It will also remove the module from the current session if it is loaded.
 .EXAMPLE
     Remove-OldPsModuleVersions
+.EXAMPLE
     Remove-OldPsModuleVersions -DryRun
 #>
 

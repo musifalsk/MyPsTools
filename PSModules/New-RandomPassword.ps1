@@ -7,7 +7,9 @@
     The password can be generated as a SecureString by using the -Secure switch.
 .EXAMPLE
     New-RandomPassword
+.EXAMPLE
     New-RandomPassword -Length 16
+.EXAMPLE
     New-RandomPassword -Length 24 -Secure
 #>
 

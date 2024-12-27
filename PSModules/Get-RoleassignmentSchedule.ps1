@@ -7,6 +7,7 @@
     Make sure that you are logged into the correct tenant (Set-AzContext) before running this script.
 .EXAMPLE
     Get-IMRoleAssignmentSchedule
+.EXAMPLE
     Get-PIM
 #>
 

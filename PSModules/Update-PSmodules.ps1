@@ -5,6 +5,7 @@
     This function will update all installed PowerShell modules to the latest version.
 .EXAMPLE
     Test-MyTestFunction -Verbose
+.EXAMPLE
     Explanation of the function or its result. You can include multiple examples with additional .EXAMPLE lines
 #>
 

@@ -11,7 +11,9 @@
     This function use https://ip-api.com website for its lookups.
 .EXAMPLE
     Get-GeoLocation 'vg.no'
+.EXAMPLE
     '8.8.8.8' | Get-GeoLocation
+.EXAMPLE
     '209.140.136.254', 'vg.no', 'http://nrk.no', '195.88.55.16' | Get-GeoLocation
 #>
 

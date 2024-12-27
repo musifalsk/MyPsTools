@@ -12,6 +12,7 @@
     Make sure that you are logged into the tenant (Set-AzContext) before running this script.
 .EXAMPLE
     Activate-PIM
+.EXAMPLE
     PIM -Justification 'Testing' -Duration 3
 #>
 

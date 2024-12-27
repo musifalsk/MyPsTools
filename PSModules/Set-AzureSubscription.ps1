@@ -10,6 +10,7 @@
     This function requires the Az module and the Az CLI to be installed.
 .EXAMPLE
     Set-AzureSubscription
+.EXAMPLE
     Set-AzureSubscription -Show
 #>
 
