@@ -21,8 +21,8 @@ function Request-RoleAssignmentSchedule {
     param(
         # $Justification = 'General Maintenance',
         # $Duration = 'PT8H'
-        [Parameter(ValueFromPipelineByPropertyName, ValueFromPipeline)]
-        [Microsoft.Azure.Commands.Profile.Models.PSAzureSubscription[]]$Subscription,
+        # [Parameter(ValueFromPipelineByPropertyName, ValueFromPipeline)]
+        # [Microsoft.Azure.Commands.Profile.Models.PSAzureSubscription[]]$Subscription,
         [Parameter(Mandatory)]
         [ValidateNotNullOrWhiteSpace()]
         [ValidateLength(5, 50)]
