@@ -60,17 +60,15 @@ function Request-RoleAssignmentSchedule {
         # Set RoleEligibilitySchedule
         $RoleEligibilitySchedule = Get-AzRoleEligibilitySchedule -Scope '/' -Filter 'asTarget()'
         if ($Subscription) {
-            $Role = $RoleEligibilitySchedule | Where-Object { $_.ScopeDisplayName -eq $Subscription.Name }
+            $RoleEligibilitySchedule = $RoleEligibilitySchedule | Where-Object { $_.ScopeDisplayName -eq $Subscription.Name }
         }
-        else {
-            $selection = $RoleEligibilitySchedule |
-                Select-Object ScopeDisplayName, RoleDefinitionDisplayName, ScopeType, EndDateTime |
-                Sort-Object -Property 'ScopeDisplayName', 'RoleDefinitionDisplayName' |
-                Out-ConsoleGridView -Title "Hey $($aduser.DisplayName)! Please select the scope you want to boss araound in." -OutputMode Single
-            $Role = $RoleEligibilitySchedule | Where-Object {
-                $_.ScopeDisplayName -eq $selection.ScopeDisplayName -and
-                $_.RoleDefinitionDisplayName -eq $selection.RoleDefinitionDisplayName
-            }
+        $selection = $RoleEligibilitySchedule |
+            Select-Object ScopeDisplayName, RoleDefinitionDisplayName, ScopeType, EndDateTime |
+            Sort-Object -Property 'ScopeDisplayName', 'RoleDefinitionDisplayName' |
+            Out-ConsoleGridView -Title "Hey $($aduser.DisplayName)! Please select the scope you want to boss araound in." -OutputMode Single
+        $Role = $RoleEligibilitySchedule | Where-Object {
+            $_.ScopeDisplayName -eq $selection.ScopeDisplayName -and
+            $_.RoleDefinitionDisplayName -eq $selection.RoleDefinitionDisplayName
         }
         Write-Output "$($cyan)I hereby sentence you to $($Role.RoleDefinitionDisplayName) in $($Role.ScopeDisplayName) for the duration of $($ExpirationDuration -replace '\D') hours!$($nocolor)"
 
