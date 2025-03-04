@@ -19,6 +19,7 @@ function Set-AzureSubscription {
     [CmdletBinding(SupportsShouldProcess = $true)]
     Param([switch]$Show)
 
+    # Color Codes
     $white = $([char]27) + '[0m'
     $green = $([char]27) + '[38;5;46m'
 
