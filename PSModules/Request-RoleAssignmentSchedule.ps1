@@ -78,7 +78,7 @@ function Request-RoleAssignmentSchedule {
             }
         }
         else { $Role = $RoleEligibilitySchedule }
-        if (!($Role)) { return 'No RoleEligibilitySchedule found. Conviction canceled..' }
+        if (!($Role)) { return 'No roles selected. Conviction canceled..' }
         Write-Output "$($cyan)I hereby sentence you to $($Role.RoleDefinitionDisplayName) in $($Role.ScopeDisplayName) for the duration of $($ExpirationDuration -replace '\D') hours!$($nocolor)"
 
 
