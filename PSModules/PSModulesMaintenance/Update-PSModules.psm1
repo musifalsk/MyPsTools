@@ -4,9 +4,10 @@
 .DESCRIPTION
     This function will update all installed PowerShell modules to the latest version.
 .EXAMPLE
-    Test-MyTestFunction -Verbose
+    Update-PSModules
 .EXAMPLE
-    Explanation of the function or its result. You can include multiple examples with additional .EXAMPLE lines
+    Update-PSModules -DiffCheck
+    (This will only show the modules that need to be updated without actually updating them.)
 #>
 
 function Update-PSModules {
