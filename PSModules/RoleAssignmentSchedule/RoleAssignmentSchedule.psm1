@@ -213,3 +213,55 @@ function Get-RoleAssignmentSchedule {
         return $RoleAssignmentSchedule | Select-Object $properties
     }
 }
+
+<#
+.SYNOPSIS
+    Deactivate a RoleAssignmentSchedule in Privileged Identity Management.
+.DESCRIPTION
+    Use this funtion instead of the portal when you want to revoke a role assignment schedule in the Privileged Identity Management.
+.NOTES
+    Required modules: Az.Accounts, Az.Resources, Microsoft.PowerShell.ConsoleGuiTools
+.EXAMPLE
+    Revoke-RoleAssignmentSchedule
+.EXAMPLE
+    Stop-PIM
+#>
+
+function Revoke-RoleAssignmentSchedule {
+    [Alias('Stop-PIM')]
+
+    $context = Get-AzContext
+    $aduser = Get-AzADUser -UserPrincipalName $context.Account.Id
+
+    # List available RoleEligibilitySchedule
+    $RoleEligibilitySchedule = Get-AzRoleEligibilitySchedule -Scope '/' -Filter 'asTarget()'
+    $selection = $RoleEligibilitySchedule |
+        Select-Object ScopeDisplayName, RoleDefinitionDisplayName, ScopeType, EndDateTime |
+        Out-ConsoleGridView -Title "Hei $($aduser.DisplayName)!" -OutputMode Single
+
+    $Role = $RoleEligibilitySchedule | Where-Object {
+        $_.ScopeDisplayName -eq $selection.ScopeDisplayName -and
+        $_.RoleDefinitionDisplayName -eq $selection.RoleDefinitionDisplayName
+    }
+
+    # Get RoleAssignmentSchedule
+    $param = @{
+        Scope  = $Role.Scope
+        Filter = "principalId eq $($aduser.Id) and roleDefinitionId eq '$($Role.RoleDefinitionId)'"
+    }
+    $RoleAssignmentSchedule = Get-AzRoleAssignmentSchedule @param
+    $RoleAssignmentSchedule | Select-Object *
+
+    # Deactivate RoleAssignmentSchedule
+    $param = @{
+        Name                      = New-Guid
+        Scope                     = $Role.Scope
+        ExpirationType            = 'AfterDuration'
+        PrincipalId               = $aduser.Id
+        RequestType               = 'SelfDeactivate'
+        RoleDefinitionId          = $Role.RoleDefinitionId
+        ScheduleInfoStartDateTime = Get-Date -Format o
+    }
+    $response = New-AzRoleAssignmentScheduleRequest @param
+    return $response | Select-Object *
+}
