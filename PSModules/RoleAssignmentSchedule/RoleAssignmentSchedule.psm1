@@ -138,6 +138,7 @@ function Request-RoleAssignmentSchedule {
 .DESCRIPTION
     Check if your PIM is still active
 .NOTES
+    Required modules: Az, Microsoft.PowerShell.ConsoleGuiTools
     Make sure that you are logged into the correct tenant (Set-AzContext) before running this script.
 .EXAMPLE
     Get-IMRoleAssignmentSchedule
