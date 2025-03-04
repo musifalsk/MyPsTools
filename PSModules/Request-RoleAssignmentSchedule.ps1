@@ -8,21 +8,24 @@
     Parameters:
         -Justification = Message to explain your purpose ,
         -Duration = The duration of the PIM (must be in whole hours. ex: 3 for three hours),
+        -Subscription = The subscription you want to activate PIM for. If not specified it will ask you to select.
 .NOTES
-    Make sure that you are logged into the tenant (Set-AzContext) before running this script.
+    Required modules: Az, Microsoft.PowerShell.ConsoleGuiTools
 .EXAMPLE
     Activate-PIM
 .EXAMPLE
     PIM -Justification 'Testing' -Duration 3
+.EXAMPLE
+    $subscriptions = Get-AzSubscription | Where-Object { $_.Name -match 's080|s081' }
+    $subscriptions | PIM -Justification maintenance -Duration 8
 #>
 
 function Request-RoleAssignmentSchedule {
     [Alias('Activate-PIM', 'PIM', 'Set-PIM')]
     param(
-        # $Justification = 'General Maintenance',
-        # $Duration = 'PT8H'
-        # [Parameter(ValueFromPipelineByPropertyName, ValueFromPipeline)]
-        # [Microsoft.Azure.Commands.Profile.Models.PSAzureSubscription[]]$Subscription,
+        [Parameter(ValueFromPipelineByPropertyName, ValueFromPipeline)]
+        [PSCustomObject[]]$Subscription,
+        # [ValidateSet('Owner', 'Contributor', 'Reader')]$RoleDefinition,
         [Parameter(Mandatory)]
         [ValidateNotNullOrWhiteSpace()]
         [ValidateLength(5, 50)]
@@ -60,60 +63,71 @@ function Request-RoleAssignmentSchedule {
         # Set RoleEligibilitySchedule
         $RoleEligibilitySchedule = Get-AzRoleEligibilitySchedule -Scope '/' -Filter 'asTarget()'
         if ($Subscription) {
-            $RoleEligibilitySchedule = $RoleEligibilitySchedule | Where-Object { $_.ScopeDisplayName -eq $Subscription.Name }
+            # $RoleEligibilitySchedule = $RoleEligibilitySchedule | Where-Object { $_.ScopeDisplayName -eq $Subscription.Name }
+            # $RoleEligibilitySchedule = $RoleEligibilitySchedule | Where-Object { ($_.Scope -replace '/subscriptions/' -replace '/.*') -in $Subscription.Id }
+            $RoleEligibilitySchedule = $RoleEligibilitySchedule | Where-Object { ($_.Scope -replace '/subscriptions/|/.*') -in $Subscription.Id }
         }
-        $selection = $RoleEligibilitySchedule |
-            Select-Object ScopeDisplayName, RoleDefinitionDisplayName, ScopeType, EndDateTime |
-            Sort-Object -Property 'ScopeDisplayName', 'RoleDefinitionDisplayName' |
-            Out-ConsoleGridView -Title "Hey $($aduser.DisplayName)! Please select the scope you want to boss araound in." -OutputMode Single
-        $Role = $RoleEligibilitySchedule | Where-Object {
-            $_.ScopeDisplayName -eq $selection.ScopeDisplayName -and
-            $_.RoleDefinitionDisplayName -eq $selection.RoleDefinitionDisplayName
+        if ($RoleEligibilitySchedule.Count -gt 1) {
+            $selection = $RoleEligibilitySchedule |
+                Select-Object ScopeDisplayName, RoleDefinitionDisplayName, ScopeType, EndDateTime |
+                Sort-Object -Property 'ScopeDisplayName', 'RoleDefinitionDisplayName' |
+                Out-ConsoleGridView -Title "Hey $($aduser.DisplayName)! Please select the scope you want to boss araound in." -OutputMode Multiple
+            $Role = $RoleEligibilitySchedule | Where-Object {
+                $_.ScopeDisplayName -in $selection.ScopeDisplayName -and
+                $_.RoleDefinitionDisplayName -in $selection.RoleDefinitionDisplayName
+            }
         }
+        else { $Role = $RoleEligibilitySchedule }
+        if (!($Role)) { return 'No RoleEligibilitySchedule found. Conviction canceled..' }
         Write-Output "$($cyan)I hereby sentence you to $($Role.RoleDefinitionDisplayName) in $($Role.ScopeDisplayName) for the duration of $($ExpirationDuration -replace '\D') hours!$($nocolor)"
 
-        # Check if RoleAssignmentSchedule is already active
-        $param = @{
-            Scope  = $Role.Scope
-            Filter = "principalId eq $($aduser.Id) and roleDefinitionId eq '$($Role.RoleDefinitionId)'"
-        }
-        $RoleAssignmentSchedule = Get-AzRoleAssignmentSchedule @param
-        if ($RoleAssignmentSchedule) {
-            $RequestType = 'SelfExtend'
-            Write-Warning 'AzRoleAssignmentSchedule is still active. This tenant does not support SelfExtend without AdminConsent. Conviction canceled..'
-            break
-        }
-        else { $RequestType = 'SelfActivate' }
-        Write-Output "$($cyan)Request type will be set to $($RequestType)$($nocolor)."
 
-        # Send RoleAssignmentScheduleRequest
-        $param = @{
-            Name                      = New-Guid
-            Scope                     = $Role.Scope
-            PrincipalId               = $aduser.Id
-            RequestType               = $RequestType
-            Justification             = $Justification
-            ScheduleInfoStartDateTime = Get-Date -Format o
-            ExpirationType            = 'AfterDuration'
-            ExpirationDuration        = $ExpirationDuration
-            RoleDefinitionId          = $Role.RoleDefinitionId
-        }
-        $response = New-AzRoleAssignmentScheduleRequest @param
+        $Role | ForEach-Object {
+            $r = $_
 
-        # Return something so that it looks like something has happened
-        $properties = @(
-            'ScopeDisplayName'
-            'RoleDefinitionDisplayName'
-            'PrincipalEmail'
-            'Status'
-            @{ N = 'CreatedOn'; E = { $_.CreatedOn.ToLocalTime() } }
-            @{ N = 'EndDateTime'; E = { $_.CreatedOn.ToLocalTime().AddHours($_.ExpirationDuration -replace '\D') } }
-            'ExpirationDuration'
-            'Justification'
-            'RequestType'
-            'RequestorId'
-            @{ N = 'RoleAssignmentScheduleName'; E = { $_.Name } }
-        )
-        $response | Select-Object $properties
+            # Check if RoleAssignmentSchedule is already active
+            $param = @{
+                Scope  = $r.Scope
+                Filter = "principalId eq $($aduser.Id) and roleDefinitionId eq '$($r.RoleDefinitionId)'"
+            }
+            $RoleAssignmentSchedule = Get-AzRoleAssignmentSchedule @param
+            if ($RoleAssignmentSchedule) {
+                $RequestType = 'SelfExtend'
+                Write-Warning 'AzRoleAssignmentSchedule is still active. This tenant does not support SelfExtend without AdminConsent. Conviction canceled..'
+                break
+            }
+            else { $RequestType = 'SelfActivate' }
+            Write-Output "$($cyan)Request type will be set to $($RequestType)$($nocolor)."
+
+            # Send RoleAssignmentScheduleRequest
+            $param = @{
+                Name                      = New-Guid
+                Scope                     = $r.Scope
+                PrincipalId               = $aduser.Id
+                RequestType               = $RequestType
+                Justification             = $Justification
+                ScheduleInfoStartDateTime = Get-Date -Format o
+                ExpirationType            = 'AfterDuration'
+                ExpirationDuration        = $ExpirationDuration
+                RoleDefinitionId          = $r.RoleDefinitionId
+            }
+            $response = New-AzRoleAssignmentScheduleRequest @param
+
+            # Return something so that it looks like something has happened
+            $properties = @(
+                'ScopeDisplayName'
+                'RoleDefinitionDisplayName'
+                'PrincipalEmail'
+                'Status'
+                @{ N = 'CreatedOn'; E = { $_.CreatedOn.ToLocalTime() } }
+                @{ N = 'EndDateTime'; E = { $_.CreatedOn.ToLocalTime().AddHours($_.ExpirationDuration -replace '\D') } }
+                'ExpirationDuration'
+                'Justification'
+                'RequestType'
+                'RequestorId'
+                @{ N = 'RoleAssignmentScheduleName'; E = { $_.Name } }
+            )
+            $response | Select-Object $properties
+        }
     }
 }
