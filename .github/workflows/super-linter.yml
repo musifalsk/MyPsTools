@@ -23,9 +23,11 @@ jobs:
         DEFAULT_BRANCH: main
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         VALIDATE_ALL_CODEBASE: false
-        VALIDATE_JSCPD: false
-        VALIDATE_KUBERNETES_KUBEVAL: false
-        VALIDATE_CHECKOV: false
-        VALIDATE_JSON_PRETTIER: false
-        VALIDATE_YAML_PRETTIER: false
-        # VALIDATE_POWERSHELL: true
+        # VALIDATE_JSCPD: false
+        # VALIDATE_KUBERNETES_KUBEVAL: false
+        # VALIDATE_CHECKOV: false
+        # VALIDATE_JSON_PRETTIER: false
+        # VALIDATE_YAML_PRETTIER: false
+        VALIDATE_JSON: true
+        VALIDATE_YAML: true
+        VALIDATE_POWERSHELL: true
