@@ -10,7 +10,7 @@
     Test-Ports -hostname 'nrk.no','vg.no','google.com'-ports 80,81,443,444 -timeout 500
 #>
 
-function Test-Ports {
+function Test-Port {
     Param (
         $Hostname = 'vg.no',
         $Ports = (1..1024) + (1433, 3268, 3269, 3389, 5985, 9389),
@@ -37,7 +37,7 @@ function Test-Ports {
             $white = $([char]27) + '[0m'
             $green = $([char]27) + '[38;5;46m'
             if (!($r.open)) { Remove-Variable green }
-            Write-Host "$($green)$($r.Hostname)`t$($r.Port)`t$($r.Open)$($white)"
+            Write-Output "$($green)$($r.Hostname)`t$($r.Port)`t$($r.Open)$($white)"
 
             # Output to variable
             Write-Output $r

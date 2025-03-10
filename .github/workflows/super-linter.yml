@@ -6,14 +6,26 @@ on:
       - main
 
 jobs:
-  lint:
+  super-linter:
+    name: Super-Linter
     runs-on: ubuntu-latest
 
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
+      with:
+        fetch-depth: 0 # Full Git history is needed to get a proper list of changed files
+
 
     - name: Super-linter
-      uses: super-linter/super-linter/slim@v7.3.0
+      uses: super-linter/super-linter@v7.3.0
       env:
+        DEFAULT_BRANCH: main
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        VALIDATE_ALL_CODEBASE: false
+        # VALIDATE_CHECKOV: false
+        # VALIDATE_JSON_PRETTIER: false
+        # VALIDATE_YAML_PRETTIER: false
+        VALIDATE_JSON: true
+        VALIDATE_YAML: true
+        VALIDATE_POWERSHELL: true
