@@ -10,7 +10,7 @@
     Test-Ports -hostname 'nrk.no','vg.no','google.com'-ports 80,81,443,444 -timeout 500
 #>
 
-function Test-Ports {
+function Test-Port {
     Param (
         $Hostname = 'vg.no',
         $Ports = (1..1024) + (1433, 3268, 3269, 3389, 5985, 9389),
