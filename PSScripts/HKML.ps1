@@ -22,6 +22,8 @@ Get-ItemPropertyValue
 
 
 # Search Value
+$result = Get-ChildItem $keyPath -Recurse -ErrorAction Ignore | ForEach-Object { $_ | Select-String -Pattern $searchValue }
+$result = Get-ChildItem $keyPath -Recurse -ErrorAction Ignore | Where-Object { $_.property -match $searchValue }
 $result = Get-ChildItem $keyPath -Recurse -ErrorAction Ignore | Where-Object { $_.property -match $searchValue }
 $result
 (Get-ItemProperty $result.PSPath).PSModulePath
