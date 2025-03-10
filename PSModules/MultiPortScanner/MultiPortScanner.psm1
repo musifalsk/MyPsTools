@@ -37,7 +37,7 @@ function Test-Ports {
             $white = $([char]27) + '[0m'
             $green = $([char]27) + '[38;5;46m'
             if (!($r.open)) { Remove-Variable green }
-            Write-Host "$($green)$($r.Hostname)`t$($r.Port)`t$($r.Open)$($white)"
+            Write-Output "$($green)$($r.Hostname)`t$($r.Port)`t$($r.Open)$($white)"
 
             # Output to variable
             Write-Output $r
