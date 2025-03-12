@@ -36,11 +36,12 @@ function Request-RoleAssignmentSchedule {
     )
 
     begin {
+        $default = $([char]27) + '[0m'
         $cyan = $([char]27) + '[38;5;51m'
-        $nocolor = $([char]27) + '[0m'
+        $orange = $([char]27) + '[38;5;214m'
 
         # Check if az is connected to a tenant
-        Write-Output "$($cyan)Please wait while I pull myself together..$($nocolor)"
+        Write-Output "$($cyan)Please wait while I pull myself together..$($default)"
         $action = @{ ErrorAction = 'Stop'; WarningAction = 'Stop' }
         try {
             Get-AzTenant @action | Out-Null
@@ -51,7 +52,7 @@ function Request-RoleAssignmentSchedule {
             Write-Warning 'Looks like you are not logged in to any Azure Tenants.
             Please login with the webpage that just opend in your default browser'
             $account = Connect-AzAccount
-            return "$($cyan)You are now logged in as $($account.Context.Account.Id). Please re-run the command.$($nocolor)"
+            return "$($cyan)You are now logged in as $($account.Context.Account.Id). Please re-run the command.$($default)"
         }
 
         # Check Duration variable
@@ -63,8 +64,6 @@ function Request-RoleAssignmentSchedule {
         # Set RoleEligibilitySchedule
         $RoleEligibilitySchedule = Get-AzRoleEligibilitySchedule -Scope '/' -Filter 'asTarget()'
         if ($Subscription) {
-            # $RoleEligibilitySchedule = $RoleEligibilitySchedule | Where-Object { $_.ScopeDisplayName -eq $Subscription.Name }
-            # $RoleEligibilitySchedule = $RoleEligibilitySchedule | Where-Object { ($_.Scope -replace '/subscriptions/' -replace '/.*') -in $Subscription.Id }
             $RoleEligibilitySchedule = $RoleEligibilitySchedule | Where-Object { ($_.Scope -replace '/subscriptions/|/.*') -in $Subscription.Id }
         }
         if ($RoleEligibilitySchedule.Count -gt 1) {
@@ -78,8 +77,8 @@ function Request-RoleAssignmentSchedule {
             }
         }
         else { $Role = $RoleEligibilitySchedule }
-        if (!($Role)) { return 'No roles selected. Conviction canceled..' }
-        Write-Output "$($cyan)I hereby sentence you to $($Role.RoleDefinitionDisplayName) in $($Role.ScopeDisplayName) for the duration of $($ExpirationDuration -replace '\D') hours!$($nocolor)"
+        if (!($Role)) { return "$($orange)No roles selected. Conviction canceled..$($default)" }
+        Write-Output "$($cyan)I hereby sentence you to $($Role.RoleDefinitionDisplayName) in $($Role.ScopeDisplayName) for the duration of $($ExpirationDuration -replace '\D') hours!$($default)"
 
 
         $Role | ForEach-Object {
@@ -97,7 +96,7 @@ function Request-RoleAssignmentSchedule {
                 break
             }
             else { $RequestType = 'SelfActivate' }
-            Write-Output "$($cyan)Request type will be set to $($RequestType)$($nocolor)."
+            Write-Output "$($cyan)Request type will be set to $($RequestType)$($default)."
 
             # Send RoleAssignmentScheduleRequest
             $param = @{
@@ -155,11 +154,11 @@ function Get-RoleAssignmentSchedule {
     )
 
     begin {
+        $default = $([char]27) + '[0m'
         $cyan = $([char]27) + '[38;5;51m'
-        $nocolor = $([char]27) + '[0m'
 
         # Check if az is connected to a tenant
-        Write-Output "$($cyan)Please wait while I pull myself together..$($nocolor)"
+        Write-Output "$($cyan)Please wait while I pull myself together..$($default)"
         $action = @{ ErrorAction = 'Stop'; WarningAction = 'Stop' }
         try {
             Get-AzTenant @action | Out-Null
@@ -170,7 +169,7 @@ function Get-RoleAssignmentSchedule {
             Write-Warning 'Looks like you are not logged in to any Azure Tenants.
             Please login with the webpage that just opend in your default browser'
             $account = Connect-AzAccount
-            return "$($cyan)You are now logged in as $($account.Context.Account.Id). Please re-run the command.$($nocolor)"
+            return "$($cyan)You are now logged in as $($account.Context.Account.Id). Please re-run the command.$($default)"
         }
     }
 
