@@ -14,7 +14,7 @@
 #>
 
 function New-RandomPassword {
-    [Alias('Generate-RandomPassword')]
+    [Alias('Generate-RandomPassword', 'Get-RandomPassword')]
     param(
         [int]$Length = 32,
         [switch]$Secure
