@@ -161,8 +161,10 @@ function Request-RoleAssignmentSchedule {
 #>
 
 function Get-RoleAssignmentSchedule {
-    [CmdletBinding()]
+    [OutputType([string])]
+    [OutputType([PSCustomObject])]
     [Alias('Get-PIM', 'PIMCheck')]
+    [CmdletBinding()]
     param(
         [Parameter(ValueFromPipelineByPropertyName, ValueFromPipeline)]
         [PSCustomObject[]]$Subscription
