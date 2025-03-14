@@ -34,6 +34,8 @@ function Set-AzureSubscription {
         Start-Sleep -Seconds 1
         az login --only-show-errors
     }
+
+    # Sets the context for the Powershell module and the az cli
     if (!($Show)) {
         $select = Get-AzSubscription | Out-ConsoleGridView -Title 'Select Subscription' -OutputMode Single
         Set-AzContext -SubscriptionObject $select | Out-Null
