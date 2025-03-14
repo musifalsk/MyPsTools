@@ -1,5 +1,33 @@
 <#
 .SYNOPSIS
+    Check if az is connected to a tenant
+.DESCRIPTION
+    This function is used by the other functions in this module to check if az is connected to a tenant.
+    It also sets the global variable $aduser to the current logged in user.
+    If az is not connected to a tenant it will prompt the user to login.
+.NOTES
+    Required modules: Az.Accounts
+#>
+
+function Test-TenantConnection {
+    # Check if az is connected to a tenant
+    Write-Output "$($cyan)Please wait while I pull myself together..$($default)"
+    $action = @{ ErrorAction = 'Stop'; WarningAction = 'Stop' }
+    try {
+        Get-AzTenant @action | Out-Null
+        $context = Get-AzContext @action
+        $global:aduser = Get-AzADUser -UserPrincipalName $context.Account.Id @action
+    }
+    catch {
+        Write-Warning 'Looks like you are not logged in to any Azure Tenants.
+            Please login with the webpage that just opend in your default browser'
+        $account = Connect-AzAccount
+        return "$($cyan)You are now logged in as $($account.Context.Account.Id). Please re-run the command.$($default)"
+    }
+}
+
+<#
+.SYNOPSIS
     Sends a request to activate a role in Privileged Identity Management.
 .DESCRIPTION
     Use this funtion instead of the portal when you want to elevate your Owner / Contributor role in the Privileged Identity Management.
@@ -19,23 +47,6 @@
     $subscriptions = Get-AzSubscription | Where-Object { $_.Name -match 's080|s081' }
     $subscriptions | PIM -Justification maintenance -Duration 8
 #>
-
-function Test-TenantConnection {
-    # Check if az is connected to a tenant
-    Write-Output "$($cyan)Please wait while I pull myself together..$($default)"
-    $action = @{ ErrorAction = 'Stop'; WarningAction = 'Stop' }
-    try {
-        Get-AzTenant @action | Out-Null
-        $context = Get-AzContext @action
-        $global:aduser = Get-AzADUser -UserPrincipalName $context.Account.Id @action
-    }
-    catch {
-        Write-Warning 'Looks like you are not logged in to any Azure Tenants.
-            Please login with the webpage that just opend in your default browser'
-        $account = Connect-AzAccount
-        return "$($cyan)You are now logged in as $($account.Context.Account.Id). Please re-run the command.$($default)"
-    }
-}
 
 function Request-RoleAssignmentSchedule {
     [Alias('Activate-PIM', 'PIM', 'Set-PIM')]
