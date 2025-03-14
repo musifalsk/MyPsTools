@@ -4,11 +4,12 @@
 .DESCRIPTION
     This function will update all installed PowerShell modules to the latest version.
     Each module will be updated in a separate job. Use Get-Job to see the progress. Use Receive-Job to see the output.
+.PARAMETER DiffCheck
+    If this switch is present, the function will only output the modules that need to be updated without actually doing it.
 .EXAMPLE
     Update-PSModules
 .EXAMPLE
     Update-PSModules -DiffCheck
-    # (This will only show the modules that need to be updated without actually updating them.)
 #>
 
 function Update-PSModules {
@@ -57,6 +58,8 @@ function Update-PSModules {
 .DESCRIPTION
     This function will remove all but the latest version of installed PowerShell modules.
     Each module will be removed in a separate job. Use Get-Job to see the progress. Use Receive-Job to see the output.
+.PARAMETER DryRun
+    If this switch is present, the function will only output what it would do without actually doing it.
 .EXAMPLE
     Remove-OldPsModuleVersions
 .EXAMPLE
@@ -69,9 +72,7 @@ function Remove-OldPsModuleVersions {
     param ([switch]$DryRun)
 
     $orange = $([char]27) + '[38;5;214m'
-    $yellow = $([char]27) + '[38;5;11m'
     $green = $([char]27) + '[38;5;46m'
-    $blue = $([char]27) + '[38;5;75m'
     $white = $([char]27) + '[0m'
 
     $modules = Get-InstalledModule
