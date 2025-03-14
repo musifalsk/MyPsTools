@@ -1,14 +1,42 @@
 <#
 .SYNOPSIS
+    Check if az is connected to a tenant
+.DESCRIPTION
+    This function is used by the other functions in this module to check if az is connected to a tenant.
+    It also sets the global variable $aduser to the current logged in user.
+    If az is not connected to a tenant it will prompt the user to login.
+.NOTES
+    Required modules: Az.Accounts
+#>
+
+function Test-TenantConnection {
+    # Check if az is connected to a tenant
+    Write-Output "$($cyan)Please wait while I pull myself together..$($default)"
+    $action = @{ ErrorAction = 'Stop'; WarningAction = 'Stop' }
+    try {
+        Get-AzTenant @action | Out-Null
+        $context = Get-AzContext @action
+        $global:aduser = Get-AzADUser -UserPrincipalName $context.Account.Id @action
+    }
+    catch {
+        Write-Warning 'Looks like you are not logged in to any Azure Tenants.
+            Please login with the webpage that just opend in your default browser'
+        $account = Connect-AzAccount
+        return "$($cyan)You are now logged in as $($account.Context.Account.Id). Please re-run the command.$($default)"
+    }
+}
+
+<#
+.SYNOPSIS
     Sends a request to activate a role in Privileged Identity Management.
 .DESCRIPTION
     Use this funtion instead of the portal when you want to elevate your Owner / Contributor role in the Privileged Identity Management.
     If your PIM is already active it will automatically extend the duration instead.
 
     Parameters:
+        -Subscription = The subscription you want to activate PIM for. If not specified it will ask you to select.
         -Justification = Message to explain your purpose ,
         -Duration = The duration of the PIM (must be in whole hours. ex: 3 for three hours),
-        -Subscription = The subscription you want to activate PIM for. If not specified it will ask you to select.
 .NOTES
     Required modules: Az, Microsoft.PowerShell.ConsoleGuiTools
 .EXAMPLE
@@ -36,23 +64,25 @@ function Request-RoleAssignmentSchedule {
     )
 
     begin {
+        $default = $([char]27) + '[0m'
         $cyan = $([char]27) + '[38;5;51m'
-        $nocolor = $([char]27) + '[0m'
+        $orange = $([char]27) + '[38;5;214m'
 
-        # Check if az is connected to a tenant
-        Write-Output "$($cyan)Please wait while I pull myself together..$($nocolor)"
-        $action = @{ ErrorAction = 'Stop'; WarningAction = 'Stop' }
-        try {
-            Get-AzTenant @action | Out-Null
-            $context = Get-AzContext @action
-            $aduser = Get-AzADUser -UserPrincipalName $context.Account.Id @action
-        }
-        catch {
-            Write-Warning 'Looks like you are not logged in to any Azure Tenants.
-            Please login with the webpage that just opend in your default browser'
-            $account = Connect-AzAccount
-            return "$($cyan)You are now logged in as $($account.Context.Account.Id). Please re-run the command.$($nocolor)"
-        }
+        Test-TenantConnection
+        # # Check if az is connected to a tenant
+        # Write-Output "$($cyan)Please wait while I pull myself together..$($default)"
+        # $action = @{ ErrorAction = 'Stop'; WarningAction = 'Stop' }
+        # try {
+        #     Get-AzTenant @action | Out-Null
+        #     $context = Get-AzContext @action
+        #     $aduser = Get-AzADUser -UserPrincipalName $context.Account.Id @action
+        # }
+        # catch {
+        #     Write-Warning 'Looks like you are not logged in to any Azure Tenants.
+        #     Please login with the webpage that just opend in your default browser'
+        #     $account = Connect-AzAccount
+        #     return "$($cyan)You are now logged in as $($account.Context.Account.Id). Please re-run the command.$($default)"
+        # }
 
         # Check Duration variable
         if ([int]($Duration -replace '\D') -gt 8) { $ExpirationDuration = 'PT8H' }
@@ -63,8 +93,6 @@ function Request-RoleAssignmentSchedule {
         # Set RoleEligibilitySchedule
         $RoleEligibilitySchedule = Get-AzRoleEligibilitySchedule -Scope '/' -Filter 'asTarget()'
         if ($Subscription) {
-            # $RoleEligibilitySchedule = $RoleEligibilitySchedule | Where-Object { $_.ScopeDisplayName -eq $Subscription.Name }
-            # $RoleEligibilitySchedule = $RoleEligibilitySchedule | Where-Object { ($_.Scope -replace '/subscriptions/' -replace '/.*') -in $Subscription.Id }
             $RoleEligibilitySchedule = $RoleEligibilitySchedule | Where-Object { ($_.Scope -replace '/subscriptions/|/.*') -in $Subscription.Id }
         }
         if ($RoleEligibilitySchedule.Count -gt 1) {
@@ -78,9 +106,8 @@ function Request-RoleAssignmentSchedule {
             }
         }
         else { $Role = $RoleEligibilitySchedule }
-        if (!($Role)) { return 'No roles selected. Conviction canceled..' }
-        Write-Output "$($cyan)I hereby sentence you to $($Role.RoleDefinitionDisplayName) in $($Role.ScopeDisplayName) for the duration of $($ExpirationDuration -replace '\D') hours!$($nocolor)"
-
+        if (!($Role)) { return "$($orange)No roles selected. Conviction canceled..$($default)" }
+        Write-Output "$($cyan)I hereby sentence you to $($Role.RoleDefinitionDisplayName) in $($Role.ScopeDisplayName) for the duration of $($ExpirationDuration -replace '\D') hours!$($default)"
 
         $Role | ForEach-Object {
             $r = $_
@@ -97,7 +124,7 @@ function Request-RoleAssignmentSchedule {
                 break
             }
             else { $RequestType = 'SelfActivate' }
-            Write-Output "$($cyan)Request type will be set to $($RequestType)$($nocolor)."
+            Write-Output "$($cyan)Request type will be set to $($RequestType)$($default)."
 
             # Send RoleAssignmentScheduleRequest
             $param = @{
@@ -151,67 +178,72 @@ function Get-RoleAssignmentSchedule {
     [Alias('Get-PIM', 'PIMCheck')]
     param(
         [Parameter(ValueFromPipelineByPropertyName, ValueFromPipeline)]
-        [Microsoft.Azure.Commands.Profile.Models.PSAzureSubscription[]]$Subscription
+        [PSCustomObject[]]$Subscription
+        # [Microsoft.Azure.Commands.Profile.Models.PSAzureSubscription[]]$Subscription
     )
 
     begin {
+        $default = $([char]27) + '[0m'
         $cyan = $([char]27) + '[38;5;51m'
-        $nocolor = $([char]27) + '[0m'
+        $orange = $([char]27) + '[38;5;214m'
 
-        # Check if az is connected to a tenant
-        Write-Output "$($cyan)Please wait while I pull myself together..$($nocolor)"
-        $action = @{ ErrorAction = 'Stop'; WarningAction = 'Stop' }
-        try {
-            Get-AzTenant @action | Out-Null
-            $context = Get-AzContext @action
-            $aduser = Get-AzADUser -UserPrincipalName $context.Account.Id @action
-        }
-        catch {
-            Write-Warning 'Looks like you are not logged in to any Azure Tenants.
-            Please login with the webpage that just opend in your default browser'
-            $account = Connect-AzAccount
-            return "$($cyan)You are now logged in as $($account.Context.Account.Id). Please re-run the command.$($nocolor)"
-        }
+        Test-TenantConnection
     }
 
     process {
         # List available RoleEligibilitySchedule
         $RoleEligibilitySchedule = Get-AzRoleEligibilitySchedule -Scope '/' -Filter 'asTarget()'
         if ($Subscription) {
-            $Role = $RoleEligibilitySchedule | Where-Object { $_.ScopeDisplayName -eq $Subscription.Name }
+            $RoleEligibilitySchedule = $RoleEligibilitySchedule | Where-Object { ($_.Scope -replace '/subscriptions/|/.*') -in $Subscription.Id }
         }
-        else {
+        if ($RoleEligibilitySchedule.Count -gt 1) {
             $selection = $RoleEligibilitySchedule |
                 Select-Object ScopeDisplayName, RoleDefinitionDisplayName, ScopeType, EndDateTime |
-                Out-ConsoleGridView -Title "Hey $($aduser.DisplayName)! Please select the scope you want to boss araound in." -OutputMode Single
+                Sort-Object -Property 'ScopeDisplayName', 'RoleDefinitionDisplayName' |
+                Out-ConsoleGridView -Title "Hey $($aduser.DisplayName)! Please select the scope you want to boss araound in." -OutputMode Multiple
             $Role = $RoleEligibilitySchedule | Where-Object {
-                $_.ScopeDisplayName -eq $selection.ScopeDisplayName -and
-                $_.RoleDefinitionDisplayName -eq $selection.RoleDefinitionDisplayName
+                $_.ScopeDisplayName -in $selection.ScopeDisplayName -and
+                $_.RoleDefinitionDisplayName -in $selection.RoleDefinitionDisplayName
             }
         }
+        else { $Role = $RoleEligibilitySchedule }
+        if (!($Role)) { return "$($orange)No roles selected. Process canceled..$($default)" }
 
-        # Get RoleAssignmentSchedule
-        $param = @{
-            Scope  = $Role.Scope
-            Filter = "principalId eq $($aduser.Id) and roleDefinitionId eq '$($Role.RoleDefinitionId)'"
+        $Role | ForEach-Object {
+            $r = $_
+
+            # Get RoleAssignmentSchedule
+            $param = @{
+                Scope  = $r.Scope
+                Filter = "principalId eq $($aduser.Id) and roleDefinitionId eq '$($r.RoleDefinitionId)'"
+            }
+            $RoleAssignmentSchedule = Get-AzRoleAssignmentSchedule @param
+            if (!($RoleAssignmentSchedule)) {
+                $placeHolders = @(
+                    $($orange)
+                    $($r.RoleDefinitionDisplayName)
+                    $($r.ScopeDisplayName)
+                    $($default)
+                )
+                return "{0}No active RoleAssignmentSchedule found for the role `"{1}`" in {2}{3}" -f $placeHolders
+            }
+
+            # Return something
+            $properties = @(
+                'ScopeDisplayName'
+                'RoleDefinitionDisplayName'
+                'PrincipalEmail'
+                'Status'
+                @{ N = 'CreatedOn'; E = { $_.CreatedOn.ToLocalTime() } }
+                @{ N = 'EndDateTime'; E = { $_.EndDateTime.ToLocalTime() } }
+                @{ N = 'ExpirationDuration'; E = { ($_.EndDateTime.ToLocalTime() - (Get-Date)).TotalHours } }
+                'Justification'
+                'RequestType'
+                @{ N = 'RequestorId'; E = { $_.PrincipalId } }
+                @{ N = 'RoleAssignmentScheduleName'; E = { $_.Name } }
+            )
+            $RoleAssignmentSchedule | Select-Object $properties
         }
-        $RoleAssignmentSchedule = Get-AzRoleAssignmentSchedule @param
-
-        # Return something
-        $properties = @(
-            'ScopeDisplayName'
-            'RoleDefinitionDisplayName'
-            'PrincipalEmail'
-            'Status'
-            @{ N = 'CreatedOn'; E = { $_.CreatedOn.ToLocalTime() } }
-            @{ N = 'EndDateTime'; E = { $_.EndDateTime.ToLocalTime() } }
-            @{ N = 'ExpirationDuration'; E = { ($_.EndDateTime.ToLocalTime() - (Get-Date)).TotalHours } }
-            'Justification'
-            'RequestType'
-            @{ N = 'RequestorId'; E = { $_.PrincipalId } }
-            @{ N = 'RoleAssignmentScheduleName'; E = { $_.Name } }
-        )
-        return $RoleAssignmentSchedule | Select-Object $properties
     }
 }
 
@@ -230,39 +262,83 @@ function Get-RoleAssignmentSchedule {
 
 function Revoke-RoleAssignmentSchedule {
     [Alias('Stop-PIM')]
+    param(
+        [Parameter(ValueFromPipelineByPropertyName, ValueFromPipeline)]
+        [PSCustomObject[]]$Subscription
+        # [Microsoft.Azure.Commands.Profile.Models.PSAzureSubscription[]]$Subscription
+    )
 
-    $context = Get-AzContext
-    $aduser = Get-AzADUser -UserPrincipalName $context.Account.Id
+    begin {
+        $default = $([char]27) + '[0m'
+        $cyan = $([char]27) + '[38;5;51m'
+        $orange = $([char]27) + '[38;5;214m'
 
-    # List available RoleEligibilitySchedule
-    $RoleEligibilitySchedule = Get-AzRoleEligibilitySchedule -Scope '/' -Filter 'asTarget()'
-    $selection = $RoleEligibilitySchedule |
-        Select-Object ScopeDisplayName, RoleDefinitionDisplayName, ScopeType, EndDateTime |
-        Out-ConsoleGridView -Title "Hei $($aduser.DisplayName)!" -OutputMode Single
-
-    $Role = $RoleEligibilitySchedule | Where-Object {
-        $_.ScopeDisplayName -eq $selection.ScopeDisplayName -and
-        $_.RoleDefinitionDisplayName -eq $selection.RoleDefinitionDisplayName
+        Test-TenantConnection
     }
 
-    # Get RoleAssignmentSchedule
-    $param = @{
-        Scope  = $Role.Scope
-        Filter = "principalId eq $($aduser.Id) and roleDefinitionId eq '$($Role.RoleDefinitionId)'"
-    }
-    $RoleAssignmentSchedule = Get-AzRoleAssignmentSchedule @param
-    $RoleAssignmentSchedule | Select-Object *
+    process {
+        # List available RoleEligibilitySchedule
+        $RoleEligibilitySchedule = Get-AzRoleEligibilitySchedule -Scope '/' -Filter 'asTarget()'
+        if ($Subscription) {
+            $RoleEligibilitySchedule = $RoleEligibilitySchedule | Where-Object { ($_.Scope -replace '/subscriptions/|/.*') -in $Subscription.Id }
+        }
+        if ($RoleEligibilitySchedule.Count -gt 1) {
+            $selection = $RoleEligibilitySchedule |
+                Select-Object ScopeDisplayName, RoleDefinitionDisplayName, ScopeType, EndDateTime |
+                Out-ConsoleGridView -Title "Hei $($aduser.DisplayName)!" -OutputMode Multiple
 
-    # Deactivate RoleAssignmentSchedule
-    $param = @{
-        Name                      = New-Guid
-        Scope                     = $Role.Scope
-        ExpirationType            = 'AfterDuration'
-        PrincipalId               = $aduser.Id
-        RequestType               = 'SelfDeactivate'
-        RoleDefinitionId          = $Role.RoleDefinitionId
-        ScheduleInfoStartDateTime = Get-Date -Format o
+            $Role = $RoleEligibilitySchedule | Where-Object {
+                $_.ScopeDisplayName -eq $selection.ScopeDisplayName -and
+                $_.RoleDefinitionDisplayName -eq $selection.RoleDefinitionDisplayName
+            }
+        }
+        else { $Role = $RoleEligibilitySchedule }
+        if (!($Role)) { return "$($orange)No roles selected. Revoking canceled..$($default)" }
+
+        $Role | ForEach-Object {
+            $r = $_
+
+            # Get RoleAssignmentSchedule
+            $param = @{
+                Scope  = $r.Scope
+                Filter = "principalId eq $($aduser.Id) and roleDefinitionId eq '$($r.RoleDefinitionId)'"
+            }
+            $RoleAssignmentSchedule = Get-AzRoleAssignmentSchedule @param
+            if (!($RoleAssignmentSchedule)) {
+                $placeHolders = @(
+                    $($orange)
+                    $($r.RoleDefinitionDisplayName)
+                    $($r.ScopeDisplayName)
+                    $($default)
+                )
+                return "{0}No active RoleAssignmentSchedule found for the role `"{1}`" in {2}{3}" -f $placeHolders
+            }
+
+            # Deactivate RoleAssignmentSchedule
+            $param = @{
+                Name                      = New-Guid
+                Scope                     = $r.Scope
+                ExpirationType            = 'AfterDuration'
+                PrincipalId               = $aduser.Id
+                RequestType               = 'SelfDeactivate'
+                RoleDefinitionId          = $r.RoleDefinitionId
+                ScheduleInfoStartDateTime = Get-Date -Format o
+            }
+            $response = New-AzRoleAssignmentScheduleRequest @param
+            $properties = @(
+                'ScopeDisplayName'
+                'RoleDefinitionDisplayName'
+                'PrincipalEmail'
+                'Status'
+                @{ N = 'CreatedOn'; E = { $_.CreatedOn.ToLocalTime() } }
+                @{ N = 'EndDateTime'; E = { $_.ExpirationEndDateTime.ToLocalTime() } }
+                @{ N = 'ExpirationDuration'; E = { ($_.ExpirationEndDateTime.ToLocalTime() - (Get-Date)).TotalHours } }
+                'Justification'
+                'RequestType'
+                @{ N = 'RequestorId'; E = { $_.PrincipalId } }
+                @{ N = 'RoleAssignmentScheduleName'; E = { $_.Name } }
+            )
+            $response | Select-Object $properties
+        }
     }
-    $response = New-AzRoleAssignmentScheduleRequest @param
-    return $response | Select-Object *
 }
