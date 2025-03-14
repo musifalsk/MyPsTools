@@ -3,11 +3,12 @@
     Update all existing PSModules to the latest version.
 .DESCRIPTION
     This function will update all installed PowerShell modules to the latest version.
+    Each module will be updated in a separate job. Use Get-Job to see the progress. Use Receive-Job to see the output.
 .EXAMPLE
     Update-PSModules
 .EXAMPLE
     Update-PSModules -DiffCheck
-    (This will only show the modules that need to be updated without actually updating them.)
+    # (This will only show the modules that need to be updated without actually updating them.)
 #>
 
 function Update-PSModules {
@@ -55,7 +56,7 @@ function Update-PSModules {
     Removes old versions of installed PowerShell modules.
 .DESCRIPTION
     This function will remove all but the latest version of installed PowerShell modules.
-    It will also remove the module from the current session if it is loaded.
+    Each module will be removed in a separate job. Use Get-Job to see the progress. Use Receive-Job to see the output.
 .EXAMPLE
     Remove-OldPsModuleVersions
 .EXAMPLE

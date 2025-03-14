@@ -1,12 +1,12 @@
 <#
 .SYNOPSIS
-    Check if az is connected to a tenant
+    Checks if az is connected to a tenant
 .DESCRIPTION
     This function is used by the other functions in this module to check if az is connected to a tenant.
     It also sets the global variable $aduser to the current logged in user.
     If az is not connected to a tenant it will prompt the user to login.
 .NOTES
-    Required modules: Az.Accounts
+    Required modules: az.Accounts
 #>
 
 function Test-TenantConnection {
@@ -43,7 +43,7 @@ function Test-TenantConnection {
         -Justification = Message to explain your purpose ,
         -Duration = The duration of the PIM (must be in whole hours. ex: 3 for three hours),
 .NOTES
-    Required modules: Az, Microsoft.PowerShell.ConsoleGuiTools
+    Required modules: az.resources, Microsoft.PowerShell.ConsoleGuiTools
 .EXAMPLE
     Activate-PIM
 .EXAMPLE
@@ -152,8 +152,7 @@ function Request-RoleAssignmentSchedule {
 .DESCRIPTION
     Check if your PIM is still active
 .NOTES
-    Required modules: Az, Microsoft.PowerShell.ConsoleGuiTools
-    Make sure that you are logged into the correct tenant (Set-AzContext) before running this script.
+    Required modules: az.resources, Microsoft.PowerShell.ConsoleGuiTools
 .EXAMPLE
     Get-IMRoleAssignmentSchedule
 .EXAMPLE
@@ -236,7 +235,7 @@ function Get-RoleAssignmentSchedule {
 .DESCRIPTION
     Use this funtion instead of the portal when you want to revoke a role assignment schedule in the Privileged Identity Management.
 .NOTES
-    Required modules: Az.Accounts, Az.Resources, Microsoft.PowerShell.ConsoleGuiTools
+    Required modules: az.Resources, Microsoft.PowerShell.ConsoleGuiTools
 .EXAMPLE
     Revoke-RoleAssignmentSchedule
 .EXAMPLE
