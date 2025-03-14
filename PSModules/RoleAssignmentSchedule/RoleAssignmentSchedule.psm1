@@ -10,13 +10,18 @@
 #>
 
 function Test-TenantConnection {
-    # Check if az is connected to a tenant
+    # Checks if az is connected to a tenant
+    Set-Variable -Name 'default' -Value "$([char]27)[0m" -Scope 1
+    Set-Variable -Name 'cyan' -Value "$([char]27)[38;5;51m" -Scope 1
+    Set-Variable -Name 'orange' -Value "$([char]27)[38;5;214m" -Scope 1
+
     Write-Output "$($cyan)Please wait while I pull myself together..$($default)"
     $action = @{ ErrorAction = 'Stop'; WarningAction = 'Stop' }
     try {
         Get-AzTenant @action | Out-Null
         $context = Get-AzContext @action
-        $global:aduser = Get-AzADUser -UserPrincipalName $context.Account.Id @action
+        Set-Variable -Name aduser -Value (Get-AzADUser -UserPrincipalName $context.Account.Id @action) -Scope 1
+
     }
     catch {
         Write-Warning 'Looks like you are not logged in to any Azure Tenants.
@@ -64,25 +69,7 @@ function Request-RoleAssignmentSchedule {
     )
 
     begin {
-        $default = $([char]27) + '[0m'
-        $cyan = $([char]27) + '[38;5;51m'
-        $orange = $([char]27) + '[38;5;214m'
-
         Test-TenantConnection
-        # # Check if az is connected to a tenant
-        # Write-Output "$($cyan)Please wait while I pull myself together..$($default)"
-        # $action = @{ ErrorAction = 'Stop'; WarningAction = 'Stop' }
-        # try {
-        #     Get-AzTenant @action | Out-Null
-        #     $context = Get-AzContext @action
-        #     $aduser = Get-AzADUser -UserPrincipalName $context.Account.Id @action
-        # }
-        # catch {
-        #     Write-Warning 'Looks like you are not logged in to any Azure Tenants.
-        #     Please login with the webpage that just opend in your default browser'
-        #     $account = Connect-AzAccount
-        #     return "$($cyan)You are now logged in as $($account.Context.Account.Id). Please re-run the command.$($default)"
-        # }
 
         # Check Duration variable
         if ([int]($Duration -replace '\D') -gt 8) { $ExpirationDuration = 'PT8H' }
@@ -174,21 +161,17 @@ function Request-RoleAssignmentSchedule {
 #>
 
 function Get-RoleAssignmentSchedule {
-    [CmdletBinding()]
+    [OutputType([string])]
+    [OutputType([PSCustomObject])]
     [Alias('Get-PIM', 'PIMCheck')]
+    [CmdletBinding()]
     param(
         [Parameter(ValueFromPipelineByPropertyName, ValueFromPipeline)]
         [PSCustomObject[]]$Subscription
         # [Microsoft.Azure.Commands.Profile.Models.PSAzureSubscription[]]$Subscription
     )
 
-    begin {
-        $default = $([char]27) + '[0m'
-        $cyan = $([char]27) + '[38;5;51m'
-        $orange = $([char]27) + '[38;5;214m'
-
-        Test-TenantConnection
-    }
+    begin { Test-TenantConnection }
 
     process {
         # List available RoleEligibilitySchedule
@@ -268,13 +251,7 @@ function Revoke-RoleAssignmentSchedule {
         # [Microsoft.Azure.Commands.Profile.Models.PSAzureSubscription[]]$Subscription
     )
 
-    begin {
-        $default = $([char]27) + '[0m'
-        $cyan = $([char]27) + '[38;5;51m'
-        $orange = $([char]27) + '[38;5;214m'
-
-        Test-TenantConnection
-    }
+    begin { Test-TenantConnection }
 
     process {
         # List available RoleEligibilitySchedule
