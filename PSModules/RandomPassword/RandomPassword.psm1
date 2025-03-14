@@ -13,8 +13,8 @@
     New-RandomPassword -Length 24 -Secure
 #>
 
-function New-RandomPassword {
-    [Alias('Generate-RandomPassword')]
+function Get-RandomPassword {
+    [Alias('Generate-RandomPassword', 'New-RandomPassword')]
     param(
         [int]$Length = 32,
         [switch]$Secure
