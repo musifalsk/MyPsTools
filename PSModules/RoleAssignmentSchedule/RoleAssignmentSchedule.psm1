@@ -21,7 +21,6 @@ function Test-TenantConnection {
         Get-AzTenant @action | Out-Null
         $context = Get-AzContext @action
         Set-Variable -Name aduser -Value (Get-AzADUser -UserPrincipalName $context.Account.Id @action) -Scope 1
-
     }
     catch {
         Write-Warning 'Looks like you are not logged in to any Azure Tenants.
@@ -69,7 +68,8 @@ function Request-RoleAssignmentSchedule {
     )
 
     begin {
-        Test-TenantConnection
+        try { Test-TenantConnection }
+        catch { return $_ }
 
         # Check Duration variable
         if ([int]($Duration -replace '\D') -gt 8) { $ExpirationDuration = 'PT8H' }
