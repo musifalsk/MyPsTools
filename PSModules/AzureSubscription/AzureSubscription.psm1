@@ -8,10 +8,14 @@
     If the -Show switch is used, it will show the current logged in account for both Powershell module and az cli.
 .NOTES
     This function requires the Az module and the Az CLI to be installed.
+.PARAMETER Show
+    Show the current logged in account for both Powershell module and az cli.
 .EXAMPLE
     Set-AzureSubscription
 .EXAMPLE
     Set-AzureSubscription -Show
+.LINK
+    Report an issue: https://github.com/musifalsk/MyPsTools
 #>
 
 function Set-AzureSubscription {
