@@ -11,17 +11,18 @@
 
 function Test-TenantConnection {
     # Checks if az is connected to a tenant
-    Set-Variable -Name 'default' -Value "$([char]27)[0m" -Scope 1
-    Set-Variable -Name 'cyan' -Value "$([char]27)[38;5;51m" -Scope 1
-    Set-Variable -Name 'orange' -Value "$([char]27)[38;5;214m" -Scope 1
+    Set-Variable -Name 'default' -Value "$([char]27)[0m" #-Scope 1
+    Set-Variable -Name 'cyan' -Value "$([char]27)[38;5;51m" #-Scope 1
+    Set-Variable -Name 'orange' -Value "$([char]27)[38;5;214m" #-Scope 1
 
     Write-Output "$($cyan)Please wait while I pull myself together..$($default)"
     $action = @{ ErrorAction = 'Stop'; WarningAction = 'Stop' }
     try {
         Get-AzTenant @action | Out-Null
         $context = Get-AzContext @action
+        $aduser = (Get-AzADUser -UserPrincipalName $context.Account.Id @action)
         # Set-Variable -Name aduser -Value (Get-AzADUser -UserPrincipalName $context.Account.Id @action) -Scope 1
-        New-Variable -Name aduser -Value (Get-AzADUser -UserPrincipalName $context.Account.Id @action) -Scope 1
+        Write-Output "$($cyan)Hi $($aduser.DisplayName)! You are logged in to the tenant $($context.Tenant.Id).$($default)"
     }
     catch {
         Write-Warning 'Looks like you are not logged in to any Azure Tenants.
