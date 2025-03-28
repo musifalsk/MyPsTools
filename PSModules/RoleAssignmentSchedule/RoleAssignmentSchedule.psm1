@@ -10,23 +10,23 @@
 #>
 
 function Test-TenantConnection {
-    # Checks if az is connected to a tenant
-    Set-Variable -Name 'default' -Value "$([char]27)[0m" #-Scope 1
-    Set-Variable -Name 'cyan' -Value "$([char]27)[38;5;51m" #-Scope 1
-    Set-Variable -Name 'orange' -Value "$([char]27)[38;5;214m" #-Scope 1
+    $default = "$([char]27)[0m"
+    $cyan = "$([char]27)[38;5;51m"
+    $orange = "$([char]27)[38;5;214m"
+    $action = @{ ErrorAction = 'Stop'; WarningAction = 'Stop' }
 
     Write-Output "$($cyan)Please wait while I pull myself together..$($default)"
-    $action = @{ ErrorAction = 'Stop'; WarningAction = 'Stop' }
+
+    # Checks if az is connected to a tenant
     try {
         Get-AzTenant @action | Out-Null
         $context = Get-AzContext @action
         $aduser = (Get-AzADUser -UserPrincipalName $context.Account.Id @action)
-        # Set-Variable -Name aduser -Value (Get-AzADUser -UserPrincipalName $context.Account.Id @action) -Scope 1
         Write-Output "$($cyan)Hi $($aduser.DisplayName)! You are logged in to the tenant $($context.Tenant.Id).$($default)"
     }
     catch {
-        Write-Warning 'Looks like you are not logged in to any Azure Tenants.
-            Please login with the webpage that just opend in your default browser'
+        Write-Warning 'Looks like you are not logged in to any Azure Tenants.'
+        Write-Output "$($orange)Please login with the webpage that just opend in your default browser$($default)"
         $account = Connect-AzAccount
         return "$($cyan)You are now logged in as $($account.Context.Account.Id). Please re-run the command.$($default)"
     }
@@ -69,23 +69,11 @@ function Request-RoleAssignmentSchedule {
     )
 
     begin {
-        # Checks if az is connected to a tenant
-        $default = "$([char]27)[0m"
-        $cyan = "$([char]27)[38;5;51m"
-        $orange = "$([char]27)[38;5;214m"
-        $action = @{ ErrorAction = 'Stop'; WarningAction = 'Stop' }
-
-        Write-Output "$($cyan)Please wait while I pull myself together..$($default)"
-        try {
-            Get-AzTenant @action | Out-Null
-            $context = Get-AzContext @action
-            $aduser = (Get-AzADUser -UserPrincipalName $context.Account.Id @action)
-        }
-        catch {
-            Write-Warning 'Looks like you are not logged in to any Azure Tenants.
-            Please login with the webpage that just opend in your default browser'
-            $account = Connect-AzAccount
-            return "$($cyan)You are now logged in as $($account.Context.Account.Id). Please re-run the command.$($default)"
+        # Test tenant connection
+        . Test-TenantConnection
+        if (!($aduser)) {
+            Write-Output "$($orange)Please re-run the command.$($default)"
+            break
         }
 
         # Check Duration variable
@@ -188,23 +176,11 @@ function Get-RoleAssignmentSchedule {
     )
 
     begin {
-        # Checks if az is connected to a tenant
-        $default = "$([char]27)[0m"
-        $cyan = "$([char]27)[38;5;51m"
-        $orange = "$([char]27)[38;5;214m"
-        $action = @{ ErrorAction = 'Stop'; WarningAction = 'Stop' }
-
-        Write-Output "$($cyan)Please wait while I pull myself together..$($default)"
-        try {
-            Get-AzTenant @action | Out-Null
-            $context = Get-AzContext @action
-            $aduser = (Get-AzADUser -UserPrincipalName $context.Account.Id @action)
-        }
-        catch {
-            Write-Warning 'Looks like you are not logged in to any Azure Tenants.
-                    Please login with the webpage that just opend in your default browser'
-            $account = Connect-AzAccount
-            return "$($cyan)You are now logged in as $($account.Context.Account.Id). Please re-run the command.$($default)"
+        # Test tenant connection
+        . Test-TenantConnection
+        if (!($aduser)) {
+            Write-Output "$($orange)Please re-run the command.$($default)"
+            break
         }
     }
 
@@ -287,23 +263,11 @@ function Revoke-RoleAssignmentSchedule {
     )
 
     begin {
-        # Checks if az is connected to a tenant
-        $default = "$([char]27)[0m"
-        $cyan = "$([char]27)[38;5;51m"
-        $orange = "$([char]27)[38;5;214m"
-        $action = @{ ErrorAction = 'Stop'; WarningAction = 'Stop' }
-
-        Write-Output "$($cyan)Please wait while I pull myself together..$($default)"
-        try {
-            Get-AzTenant @action | Out-Null
-            $context = Get-AzContext @action
-            $aduser = (Get-AzADUser -UserPrincipalName $context.Account.Id @action)
-        }
-        catch {
-            Write-Warning 'Looks like you are not logged in to any Azure Tenants.
-                    Please login with the webpage that just opend in your default browser'
-            $account = Connect-AzAccount
-            return "$($cyan)You are now logged in as $($account.Context.Account.Id). Please re-run the command.$($default)"
+        # Test tenant connection
+        . Test-TenantConnection
+        if (!($aduser)) {
+            Write-Output "$($orange)Please re-run the command.$($default)"
+            break
         }
     }
 
