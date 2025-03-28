@@ -29,7 +29,6 @@ function Test-TenantConnection {
         $account = Connect-AzAccount
         return "$($cyan)You are now logged in as $($account.Context.Account.Id). Please re-run the command.$($default)"
     }
-    $context
 }
 
 <#
