@@ -28,7 +28,7 @@ function Test-TenantConnection {
         Write-Warning 'Looks like you are not logged in to any Azure Tenants.'
         Write-Output "$($orange)Please login with the webpage that just opend in your default browser$($default)"
         $account = Connect-AzAccount
-        return "$($cyan)You are now logged in as $($account.Context.Account.Id). Please re-run the command.$($default)"
+        return "$($cyan)You are now logged in as $($account.Context.Account.Id).$($default)"
     }
 }
 
