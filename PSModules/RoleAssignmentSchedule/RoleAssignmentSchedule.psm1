@@ -259,7 +259,6 @@ function Revoke-RoleAssignmentSchedule {
     param(
         [Parameter(ValueFromPipelineByPropertyName, ValueFromPipeline)]
         [PSCustomObject[]]$Subscription
-        # [Microsoft.Azure.Commands.Profile.Models.PSAzureSubscription[]]$Subscription
     )
 
     begin {
