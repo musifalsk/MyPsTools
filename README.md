@@ -6,6 +6,7 @@ My personal toolbox for Powershell
 
 Clone this repository to a desired location on your computer.
 The Powershell modules in this repository are not signed (me lazy) so you need to unblock them before using them.
+Example for Windows:
 
 For Windows:
 
