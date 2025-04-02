@@ -1,5 +1,5 @@
 
-$pdfPath = 'C:\Users\frank.nerland\OneDrive - Bouvet Norge AS\Documents\davechild_regular-expressions.pdf'
+$pdfPath = '<Path to pdf>'
 $pdfPath = Read-Host 'Enter the path to the PDF file'
 $docxPath = $pdfPath -replace '\.pdf$', '.docx'
 
