@@ -1,5 +1,5 @@
 
-Get-ChildItem C:\Dev
+
 Get-ChildItem HKLM:\SYSTEM\
 
 $keyPath = 'HKLM:\'
