@@ -77,8 +77,11 @@ function Request-RoleAssignmentSchedule {
 
     begin {
         # Test tenant connection
-        Test-TenantConnection
-        if (!($aduser)) { break }
+        . Test-TenantConnection
+        if (!($aduser)) {
+            Write-Output "$($orange)Please re-run the command.$($default)"
+            break
+        }
 
         # Check Duration variable
         if ([int]($Duration -replace '\D') -gt 8) { $ExpirationDuration = 'PT8H' }
@@ -187,8 +190,11 @@ function Get-RoleAssignmentSchedule {
 
     begin {
         # Test tenant connection
-        Test-TenantConnection
-        if (!($aduser)) { break }
+        . Test-TenantConnection
+        if (!($aduser)) {
+            Write-Output "$($orange)Please re-run the command.$($default)"
+            break
+        }
     }
 
     process {
@@ -276,8 +282,11 @@ function Revoke-RoleAssignmentSchedule {
 
     begin {
         # Test tenant connection
-        Test-TenantConnection
-        if (!($aduser)) { break }
+        . Test-TenantConnection
+        if (!($aduser)) {
+            Write-Output "$($orange)Please re-run the command.$($default)"
+            break
+        }
     }
 
     process {
