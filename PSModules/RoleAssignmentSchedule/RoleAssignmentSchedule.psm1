@@ -12,23 +12,25 @@
 #>
 
 function Test-TenantConnection {
-    # Checks if az is connected to a tenant
-    Set-Variable -Name 'default' -Value "$([char]27)[0m" -Scope 1
-    Set-Variable -Name 'cyan' -Value "$([char]27)[38;5;51m" -Scope 1
-    Set-Variable -Name 'orange' -Value "$([char]27)[38;5;214m" -Scope 1
+    $default = "$([char]27)[0m"
+    $cyan = "$([char]27)[38;5;51m"
+    $orange = "$([char]27)[38;5;214m"
+    $action = @{ ErrorAction = 'Stop'; WarningAction = 'Stop' }
 
     Write-Output "$($cyan)Please wait while I pull myself together..$($default)"
-    $action = @{ ErrorAction = 'Stop'; WarningAction = 'Stop' }
+
+    # Checks if az is connected to a tenant
     try {
         Get-AzTenant @action | Out-Null
         $context = Get-AzContext @action
-        Set-Variable -Name aduser -Value (Get-AzADUser -UserPrincipalName $context.Account.Id @action) -Scope 1
+        $aduser = (Get-AzADUser -UserPrincipalName $context.Account.Id @action)
+        Write-Output "$($cyan)Hi $($aduser.DisplayName)! You are logged in to the tenant $($context.Tenant.Id).$($default)"
     }
     catch {
-        Write-Warning 'Looks like you are not logged in to any Azure Tenants.
-            Please login with the webpage that just opend in your default browser'
+        Write-Warning 'Looks like you are not logged in to any Azure Tenants.'
+        Write-Output "$($orange)Please login with the webpage that just opend in your default browser$($default)"
         $account = Connect-AzAccount
-        return "$($cyan)You are now logged in as $($account.Context.Account.Id). Please re-run the command.$($default)"
+        return "$($cyan)You are now logged in as $($account.Context.Account.Id).$($default)"
     }
 }
 
@@ -64,7 +66,6 @@ function Request-RoleAssignmentSchedule {
     param(
         [Parameter(ValueFromPipelineByPropertyName, ValueFromPipeline)]
         [PSCustomObject[]]$Subscription,
-        # [ValidateSet('Owner', 'Contributor', 'Reader')]$RoleDefinition,
         [Parameter(Mandatory)]
         [ValidateNotNullOrWhiteSpace()]
         [ValidateLength(5, 50)]
@@ -75,8 +76,17 @@ function Request-RoleAssignmentSchedule {
     )
 
     begin {
+<<<<<<< HEAD
         Test-TenantConnection
         if (!($aduser)) { break }
+=======
+        # Test tenant connection
+        . Test-TenantConnection
+        if (!($aduser)) {
+            Write-Output "$($orange)Please re-run the command.$($default)"
+            break
+        }
+>>>>>>> 5fd61de2df34c3b51378a78057a7a7c0c57bc9f0
 
         # Check Duration variable
         if ([int]($Duration -replace '\D') -gt 8) { $ExpirationDuration = 'PT8H' }
@@ -184,8 +194,17 @@ function Get-RoleAssignmentSchedule {
     )
 
     begin {
+<<<<<<< HEAD
         Test-TenantConnection
         if (!($aduser)) { break }
+=======
+        # Test tenant connection
+        . Test-TenantConnection
+        if (!($aduser)) {
+            Write-Output "$($orange)Please re-run the command.$($default)"
+            break
+        }
+>>>>>>> 5fd61de2df34c3b51378a78057a7a7c0c57bc9f0
     }
 
     process {
@@ -269,12 +288,20 @@ function Revoke-RoleAssignmentSchedule {
     param(
         [Parameter(ValueFromPipelineByPropertyName, ValueFromPipeline)]
         [PSCustomObject[]]$Subscription
-        # [Microsoft.Azure.Commands.Profile.Models.PSAzureSubscription[]]$Subscription
     )
 
     begin {
+<<<<<<< HEAD
         Test-TenantConnection
         if (!($aduser)) { break }
+=======
+        # Test tenant connection
+        . Test-TenantConnection
+        if (!($aduser)) {
+            Write-Output "$($orange)Please re-run the command.$($default)"
+            break
+        }
+>>>>>>> 5fd61de2df34c3b51378a78057a7a7c0c57bc9f0
     }
 
     process {
