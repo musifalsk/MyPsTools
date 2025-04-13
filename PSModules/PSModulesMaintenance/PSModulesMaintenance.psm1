@@ -10,6 +10,8 @@
     Update-PSModules
 .EXAMPLE
     Update-PSModules -DiffCheck
+.LINK
+    Report an issue: https://github.com/musifalsk/MyPsTools
 #>
 
 function Update-PSModules {
@@ -64,9 +66,10 @@ function Update-PSModules {
     Remove-OldPsModuleVersions
 .EXAMPLE
     Remove-OldPsModuleVersions -DryRun
+.LINK
+    Report an issue: https://github.com/musifalsk/MyPsTools
 #>
 
-# Remove Old PSModuleVersions
 function Remove-OldPsModuleVersions {
     [CmdletBinding(SupportsShouldProcess = $true)]
     param ([switch]$DryRun)

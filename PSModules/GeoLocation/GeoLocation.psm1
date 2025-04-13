@@ -7,14 +7,20 @@
 .NOTES
     Provider allows 15 requests per minute from the same IP, but the script
     will send 100 entries on each request for a total of 1500.
-.LINK
-    This function use https://ip-api.com website for its lookups.
+.PARAMETER HostName
+    The hostname or ip address you want to lookup
+.INPUTS
+    String
 .EXAMPLE
     Get-GeoLocation 'vg.no'
 .EXAMPLE
     '8.8.8.8' | Get-GeoLocation
 .EXAMPLE
     '209.140.136.254', 'vg.no', 'http://nrk.no', '195.88.55.16' | Get-GeoLocation
+.LINK
+    This function use https://ip-api.com website for its lookups.
+.LINK
+    Report an issue: https://github.com/musifalsk/MyPsTools
 #>
 
 Function Get-GeoLocation {
@@ -59,7 +65,7 @@ Function Get-GeoLocation {
             if ($ip.count -gt 1500) {
                 Write-Warning 'HostName list exceeds 1500 entries. The provider will punish you for this with throtling. Continue anyway?'
                 if ((Read-Host -Prompt 'Y/N') -ne 'y') { Write-Output 'Wise choice. Good bye..' ; break }
-                else { Write-Output 'OK then. But dont come runnin afterwards saying i didnt warn you ' }
+                else { Write-Output 'OK then. But dont come runnin afterwards saying i didnt warn you.' }
             }
             do {
                 Write-Verbose 'Sending request to provider..'

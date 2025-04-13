@@ -7,6 +7,8 @@
     If az is not connected to a tenant it will prompt the user to login.
 .NOTES
     Required modules: az.Accounts
+.LINK
+    Report an issue: https://github.com/musifalsk/MyPsTools
 #>
 
 function Test-TenantConnection {
@@ -38,13 +40,16 @@ function Test-TenantConnection {
 .DESCRIPTION
     Use this funtion instead of the portal when you want to elevate your Owner / Contributor role in the Privileged Identity Management.
     If your PIM is already active it will automatically extend the duration instead.
-
-    Parameters:
-        -Subscription = The subscription you want to activate PIM for. If not specified it will ask you to select.
-        -Justification = Message to explain your purpose ,
-        -Duration = The duration of the PIM (must be in whole hours. ex: 3 for three hours),
 .NOTES
     Required modules: az.resources, Microsoft.PowerShell.ConsoleGuiTools
+.PARAMETER Subscription
+    Subscription object(s) you want to activate PIM for. If not specified it will ask you to select.
+.PARAMETER Justification
+    Message to explain your purpose
+.PARAMETER Duration
+    The duration of the PIM (must be in whole hours. ex: 3 for three hours)
+.INPUTS
+    [PSCustomObject[]]
 .EXAMPLE
     Activate-PIM
 .EXAMPLE
@@ -52,6 +57,8 @@ function Test-TenantConnection {
 .EXAMPLE
     $subscriptions = Get-AzSubscription | Where-Object { $_.Name -match 's080|s081' }
     $subscriptions | PIM -Justification maintenance -Duration 8
+.LINK
+    Report an issue: https://github.com/musifalsk/MyPsTools
 #>
 
 function Request-RoleAssignmentSchedule {
@@ -69,12 +76,17 @@ function Request-RoleAssignmentSchedule {
     )
 
     begin {
+<<<<<<< HEAD
+        Test-TenantConnection
+        if (!($aduser)) { break }
+=======
         # Test tenant connection
         . Test-TenantConnection
         if (!($aduser)) {
             Write-Output "$($orange)Please re-run the command.$($default)"
             break
         }
+>>>>>>> 5fd61de2df34c3b51378a78057a7a7c0c57bc9f0
 
         # Check Duration variable
         if ([int]($Duration -replace '\D') -gt 8) { $ExpirationDuration = 'PT8H' }
@@ -158,10 +170,16 @@ function Request-RoleAssignmentSchedule {
     Check if your PIM is still active
 .NOTES
     Required modules: az.resources, Microsoft.PowerShell.ConsoleGuiTools
+.PARAMETER Subscription
+    Subscription object(s) you want to activate PIM for. If not specified it will ask you to select.
+.INPUTS
+    [PSCustomObject[]]
 .EXAMPLE
     Get-IMRoleAssignmentSchedule
 .EXAMPLE
     Get-PIM
+.LINK
+    Report an issue: https://github.com/musifalsk/MyPsTools
 #>
 
 function Get-RoleAssignmentSchedule {
@@ -176,12 +194,17 @@ function Get-RoleAssignmentSchedule {
     )
 
     begin {
+<<<<<<< HEAD
+        Test-TenantConnection
+        if (!($aduser)) { break }
+=======
         # Test tenant connection
         . Test-TenantConnection
         if (!($aduser)) {
             Write-Output "$($orange)Please re-run the command.$($default)"
             break
         }
+>>>>>>> 5fd61de2df34c3b51378a78057a7a7c0c57bc9f0
     }
 
     process {
@@ -248,10 +271,16 @@ function Get-RoleAssignmentSchedule {
     Use this funtion instead of the portal when you want to revoke a role assignment schedule in the Privileged Identity Management.
 .NOTES
     Required modules: az.Resources, Microsoft.PowerShell.ConsoleGuiTools
+.PARAMETER Subscription
+    Subscription object(s) you want to activate PIM for. If not specified it will ask you to select.
+.INPUTS
+    [PSCustomObject[]]
 .EXAMPLE
     Revoke-RoleAssignmentSchedule
 .EXAMPLE
     Stop-PIM
+.LINK
+    Report an issue: https://github.com/musifalsk/MyPsTools
 #>
 
 function Revoke-RoleAssignmentSchedule {
@@ -262,12 +291,17 @@ function Revoke-RoleAssignmentSchedule {
     )
 
     begin {
+<<<<<<< HEAD
+        Test-TenantConnection
+        if (!($aduser)) { break }
+=======
         # Test tenant connection
         . Test-TenantConnection
         if (!($aduser)) {
             Write-Output "$($orange)Please re-run the command.$($default)"
             break
         }
+>>>>>>> 5fd61de2df34c3b51378a78057a7a7c0c57bc9f0
     }
 
     process {

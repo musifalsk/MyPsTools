@@ -1,21 +1,33 @@
 ﻿<#
 .SYNOPSIS
-    Scans the selected ports / portranges towards the hostname(s) you provide
+    Scans the selected port(s) towards the hostname(s) you provide
 .DESCRIPTION
     This function will test the selected ports / portranges towards the hostname(s) you provide.
     It will output the result to the screen and optionally export the result to an HTML file.
 .NOTES
     Faster than using Test-NetConnection
+.PARAMETER Hostname
+    The hostname(s) you want to test
+.PARAMETER Ports
+    The port(s) you want to test
+.PARAMETER Timeout
+    The timeout in milliseconds for each port test (longer timeout = slower scan)
+.PARAMETER ThrottleLimit
+    The number of parallel threads to use (default is 50)
+.PARAMETER HtmlExport
+    Export the result to an HTML file and open in browser
 .EXAMPLE
-    Test-Ports -hostname 'nrk.no','vg.no','google.com'-ports 80,81,443,444 -timeout 500
+    Test-Ports -hostname 'nrk.no','vg.no','google.com'-ports 80,81,443,445 -timeout 500
+.LINK
+    Report an issue: https://github.com/musifalsk/MyPsTools
 #>
 
 function Test-Port {
     Param (
         $Hostname = 'vg.no',
         $Ports = (1..1024) + (1433, 3268, 3269, 3389, 5985, 9389),
-        $Timeout = 200,
-        $ThrottleLimit = 50,
+        [int]$Timeout = 200,
+        [int]$ThrottleLimit = 50,
         [switch]$HtmlExport
     )
 
