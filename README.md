@@ -8,7 +8,7 @@ Clone this repository to a desired location on your computer.
 
 Example using GitHub CLI:
 
-```pwsh
+```cmd
 gh repo clone musifalsk/MyPsTools
 ```
 
