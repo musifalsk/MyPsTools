@@ -20,7 +20,7 @@ Example for Windows:
 Get-ChildItem '<path to your local cloned repo>\PSModules\*' -Recurse | Unblock-File
 ```
 
-Easiest way to ensure these modules are imported every time powershell starts is to add them to your powershell `$PROFILE`.
+The easiest way to ensure these modules are imported every time powershell starts is to add some code to your powershell `$PROFILE`.
 
 Add the following code into your `$PROFILE`:
 
