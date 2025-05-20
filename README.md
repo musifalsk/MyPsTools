@@ -12,7 +12,7 @@ Example using GitHub CLI:
 gh repo clone musifalsk/MyPsTools
 ```
 
-The Powershell modules in this repository are not signed (yes me lazy) so you need to unblock them before using them.
+The Powershell modules in this repository are not signed (yes me lazy) so you might need to unblock them before using them.
 
 Example for Windows:
 
