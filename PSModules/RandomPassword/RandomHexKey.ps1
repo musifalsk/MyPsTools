@@ -1,26 +1,26 @@
 <#
 .SYNOPSIS
-    Generates a random password
+    Generates a random hex key
 .DESCRIPTION
-    This function generates a random password with a specified length (Default: 32).
-    The password will contain lowercase letters, uppercase letters, numbers and special characters.
-    The password can be generated as a SecureString by using the -Secure switch.
+    This function generates a random hex key with a specified length (Default: 64).
+    The hex key will contain lowercase letters and numbers.
+    The hex key can be generated as a SecureString by using the -Secure switch.
 .PARAMETER Length
-    The length of the password in characters
+    The length of the hex key in characters
 .PARAMETER Secure
-    Generate the password as a SecureString
+    Generate the hex key as a SecureString
 .EXAMPLE
-    New-RandomPassword
+    New-RandomHexKey
 .EXAMPLE
-    New-RandomPassword -Length 16
+    New-RandomHexKey -Length 16
 .EXAMPLE
-    New-RandomPassword -Length 24 -Secure
+    New-RandomHexKey -Length 24 -Secure
 .LINK
     Report an issue: https://github.com/musifalsk/MyPsTools
 #>
 
-function Get-RandomPassword {
-    [Alias('Generate-RandomPassword', 'New-RandomPassword')]
+function Get-RandomHexKey {
+    [Alias('Generate-RandomHexKey', 'New-RandomHexKey')]
     param(
         [int]$Length = 64,
         [switch]$Secure
