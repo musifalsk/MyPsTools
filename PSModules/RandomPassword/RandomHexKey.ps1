@@ -27,7 +27,6 @@ function Get-RandomHexKey {
     )
 
     $chars = @()
-    # do { $chars += ('a'..'z' | Get-Random -Count 1) } until ($chars.Length -gt ($Length * 1 / 3 - 1))
     do { $chars += ('a'..'f' | Get-Random -Count 1) } until ($chars.Length -gt ($Length * 1 / 4 - 1))
     do { $chars += ('0'..'9' | Get-Random -Count 1) } until ($chars.Length -gt ($Length * 4 / 4 - 1))
     #do { $chars += ('!', '@', '#', '$', '%', '&', '=', '+', '-', '?', '^', '*', '.', ',' | Get-Random -Count 1) } until ($chars.Length -gt ($Length - 1))
