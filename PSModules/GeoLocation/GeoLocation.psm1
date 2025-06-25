@@ -23,7 +23,45 @@
     Report an issue: https://github.com/musifalsk/MyPsTools
 #>
 
-Function Get-GeoLocation {
+class GeoLocation {
+    hidden [string]$Status
+    [string]$Query
+    [string]$Country
+    hidden [string]$CountryCode
+    hidden [string]$Region
+    [string]$RegionName
+    [string]$City
+    hidden [string]$Zip
+    hidden [string]$Lat
+    hidden [string]$Lon
+    [string]$Timezone
+    [string]$ISP
+    [string]$Org
+    [string]$AS
+
+    GeoLocation([pscustomobject]$response) {
+        $this.Status = $response.status
+        $this.Query = $response.query
+        $this.Country = $response.country
+        $this.CountryCode = $response.countryCode
+        $this.Region = $response.region
+        $this.RegionName = $response.regionName
+        $this.City = $response.city
+        $this.Zip = $response.zip
+        $this.Lat = $response.lat
+        $this.Lon = $response.lon
+        $this.Timezone = $response.timezone
+        $this.ISP = $response.isp
+        $this.Org = $response.org
+        $this.AS = $response.as
+    }
+
+    [string]ToString() {
+        return "$($this.Query) - $($this.City), $($this.Country)"
+    }
+}
+
+function Get-GeoLocation {
     [CmdletBinding(DefaultParameterSetName = 'Parameter Set 1')]
     [Alias('geoloc')]
     param(
@@ -46,12 +84,12 @@ Function Get-GeoLocation {
         foreach ($h in $HostName) {
             Write-Verbose "Processing $(($c++)) - Hostname $($h)"
             $h = $h -replace '^https?://'
-            if ($h -match '^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$') { $i = $h }
+            if ($h -match '^\d{1,3}(\.\d{1,3}){3}$') { $i = $h }
             else {
                 try { $i = ((Resolve-DnsName $h -Type A -ErrorAction Stop)[0]).IPAddress }
                 catch { $i = $h }
             }
-            if ($i -notmatch '^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$' -and $null -ne $i) {
+            if ($i -notmatch '^\d{1,3}(\.\d{1,3}){3}$' -and $null -ne $i) {
                 Write-Warning "$i is not a valid IPAddress." ; continue
             }
             $ip += "`"$($i)`""
@@ -72,13 +110,17 @@ Function Get-GeoLocation {
                 $ipslice = $ip[0..99]
                 $ip = $ip[100..$($ip.count)]
                 $body = ("`[$($ipslice)`]" -replace '\s', ',')
-                (Invoke-WebRequest -Method Post -Uri 'http://ip-api.com/batch' -Body $body).Content | ConvertFrom-Json
+                $results = (Invoke-WebRequest -Method Post -Uri 'http://ip-api.com/batch' -Body $body).Content | ConvertFrom-Json
+                foreach ($r in $results) {
+                    [GeoLocation]::new($r)
+                }
             }
-            until ($ip.count -lt 1)
+            until ($ip.Count -lt 1)
         }
         else {
             Write-Verbose 'Sending request for your public IP' -Verbose
-            Invoke-RestMethod -Method Get -Uri 'http://ip-api.com/json/'
+            $result = Invoke-RestMethod -Method Get -Uri 'http://ip-api.com/json/'
+            [GeoLocation]::new($result)
         }
         if ($HostName) { Remove-Variable HostName }
     }
