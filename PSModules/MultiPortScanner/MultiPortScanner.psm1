@@ -15,60 +15,59 @@
 .PARAMETER ThrottleLimit
     The number of parallel threads to use (default is 50)
 .PARAMETER HtmlExport
-    Export the result to an HTML file and open in browser
+    Export the result to an HTML file and open in browser (DECOMISSIONED!)
 .EXAMPLE
-    Test-Ports -hostname 'nrk.no','vg.no','google.com'-ports 80,81,443,445 -timeout 500
+    Test-Port -hostname 'nrk.no','vg.no','google.com'-ports ((1..100) + (443,445,4433,8080))-timeout 500
 .LINK
     Report an issue: https://github.com/musifalsk/MyPsTools
 #>
 
+
 function Test-Port {
+    [CmdletBinding()]
+    [OutputType([PortScan])]
     Param (
-        $Hostname = 'vg.no',
-        $Ports = (1..1024) + (1433, 3268, 3269, 3389, 5985, 9389),
+        [string[]]$Hostname = 'vg.no',
+        [int[]]$Ports = (1..1024) + (1433, 3268, 3269, 3389, 5985, 9389),
         [int]$Timeout = 200,
         [int]$ThrottleLimit = 50,
         [switch]$HtmlExport
     )
 
-    $result = $ports | ForEach-Object -Parallel {
+    $ports | ForEach-Object -Parallel {
         $p = $_
+
+        class PortScan {
+            [string]$Hostname
+            [int]$Port
+            [bool]$Open
+
+            PortScan([string]$h, [int]$p, [bool]$o) {
+                $this.Hostname = $h
+                $this.Port = $p
+                $this.Open = $o
+            }
+
+            [string]ToString() {
+                return "$($this.Hostname)`t$($this.Port)`t$($this.Open)"
+            }
+        }
+
         foreach ($h in $using:Hostname) {
             $tcpclient = New-Object System.Net.Sockets.TcpClient
             $tcpclient.BeginConnect($h, $p, $null, $null) | Out-Null
             Start-Sleep -milli $using:Timeout
-            if ($tcpclient.Connected) { $open = $true } else { $open = $false }
+            $open = $tcpclient.Connected -eq $true
             $tcpclient.Close()
-            $r = [pscustomobject]@{
-                Hostname = $h
-                Port     = $p
-                Open     = $open
-            }
-
-            # Output to screen
-            $white = $([char]27) + '[0m'
-            $green = $([char]27) + '[38;5;46m'
-            if (!($r.open)) { Remove-Variable green }
-            Write-Output "$($green)$($r.Hostname)`t$($r.Port)`t$($r.Open)$($white)"
-
-            # Output to variable
-            Write-Output $r
+            [PortScan]::new($h, $p, $open)
         }
     } -UseNewRunspace -ThrottleLimit $ThrottleLimit
 
-    # Output Result
-    if ($result | Where-Object { $_.Open -eq $true }) {
-        $result | Where-Object { $_.Open -eq $true } |
-            Sort-Object Hostname, Port |
-            Format-Table
-    }
-    else { Write-Output 'Result: Found no open ports!' }
-
     # Export Html file and open in browser
-    if ($HtmlExport) {
-        $result | Where-Object { $_.Open -eq $true } |
-            Sort-Object Hostname, Port |
-            ConvertTo-Html > "$env:TMP\TestPort_Result.html"
-        & "$env:TMP\TestPort_Result.html"
-    }
+    # if ($HtmlExport) {
+    #     $result | Where-Object { $_.Open -eq $true } |
+    #         Sort-Object Hostname, Port, Open |
+    #         ConvertTo-Html > "$env:TMP\TestPort_Result.html"
+    #     & "$env:TMP\TestPort_Result.html"
+    # }
 }
