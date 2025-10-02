@@ -118,9 +118,9 @@ function Request-RoleAssignmentSchedule {
             }
             $RoleAssignmentSchedule = Get-AzRoleAssignmentSchedule @param
             if ($RoleAssignmentSchedule) {
-                $RequestType = 'SelfExtend'
-                Write-Warning 'AzRoleAssignmentSchedule is still active. This tenant does not support SelfExtend without AdminConsent. Conviction canceled..'
-                break
+                $localEndTime = [System.TimeZoneInfo]::ConvertTimeFromUtc([DateTime]$RoleAssignmentSchedule.EndDateTime, [System.TimeZoneInfo]::Local)
+                Write-Warning "$($green)$($_.RoleDefinitionDisplayName)$($nocolor) in $($green)$($_.ScopeDisplayName)$($nocolor) is already active until $($localEndTime.ToString("HH:mm"))."
+                return
             }
             else { $RequestType = 'SelfActivate' }
             Write-Output "$($cyan)Request type will be set to $($RequestType)$($default)."
