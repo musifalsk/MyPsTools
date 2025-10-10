@@ -30,8 +30,7 @@ function Get-RandomPassword {
     do { $chars += ('a'..'z' | Get-SecureRandom -Count 1) } until ($chars.Length -gt ($Length * 1 / 4 - 1))
     do { $chars += ('A'..'Z' | Get-SecureRandom -Count 1) } until ($chars.Length -gt ($Length * 2 / 4 - 1))
     do { $chars += ('0'..'9' | Get-SecureRandom -Count 1) } until ($chars.Length -gt ($Length * 3 / 4 - 1))
-    do { $chars += ('!', '@', '#', '$', '%', '&', '=', '+', '-', '?', '^', '*', '.', ',' | Get-SecureRandom -Count 1) }
-    until ($chars.Length -gt ($Length - 1))
+    do { $chars += ([char[]]'!"#$%&()*+,-./:;<=>?@[\]^_`{|}~' | Get-SecureRandom -Count 1) } until ($chars.Length -gt ($Length - 1))
     $pw = -join ($chars | Sort-Object { Get-SecureRandom })
     if ($Secure) { $pw = $pw | ConvertTo-SecureString -AsPlainText -Force }
     return $pw
