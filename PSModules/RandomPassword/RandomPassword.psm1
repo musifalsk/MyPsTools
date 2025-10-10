@@ -71,4 +71,3 @@ function Get-RandomHexKey {
     if ($Secure) { $pw = $pw | ConvertTo-SecureString -AsPlainText -Force }
     return $pw
 }
-
