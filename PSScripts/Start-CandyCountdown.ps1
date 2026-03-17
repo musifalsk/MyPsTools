@@ -9,13 +9,14 @@ for ($i = 0; $i -le 7; $i++) {
 }
 $span = New-TimeSpan -Start (Get-Date) -End $nextFriday
 if ($span -gt [timespan]::new(6, 21, 0, 0)) {
-    Write-Output 'Hurra!! Det er godteritid :D'
+    $msg = 'Hurra!! Det er godteritid :D'
 }
 else {
-    Write-Output ('Det er {0} dag{1}, {2} time{3} og {4} minutt{5} igjen til godteri.' -f @(
+    $msg = ('Det er {0} dag{1}, {2} time{3} og {4} minutt{5} igjen til godteri.' -f @(
             $span.Days, ($span.Days -ne 1 ? 'er' : $null),
             $span.Hours, ($span.Hours -ne 1 ? 'r'  : $null),
             $span.Minutes, ($span.Minutes -ne 1 ? 'er' : $null)
         )
     )
 }
+Write-Output $msg
