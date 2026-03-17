@@ -3,13 +3,14 @@ name: Candy Countdown
 on:
   workflow_dispatch:
   schedule:
-    - cron: "0/15 6-18 * * 1-5"
+    - cron: "*/15 6-18 * * 1-5"
 
 jobs:
   build:
+    environment: fyo
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - name: Run a PS script
         shell: pwsh
-        run: ./PSScripts/Start-CandyCountdown.ps1
+        run: ./PSScripts/Start-CandyCountdown.ps1 -Webhook "${{ secrets.webhook }}"
