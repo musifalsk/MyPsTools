@@ -13,7 +13,7 @@ for ($i = 0; $i -le 7; $i++) {
 }
 $span = New-TimeSpan -Start (Get-Date) -End $nextFriday
 if ($span -gt [timespan]::new(6, 21, 0, 0)) {
-    $msg = 'Hurra!! Det er godteritid 😊🍬🍭'
+    $msg = 'Hurra!! Det er godteritid 🎉🍬🍭😊'
 }
 else {
     $msg = ('Det er {0} dag{1}, {2} time{3} og {4} minutt{5} igjen til godteri. 🍬🍭' -f @(
