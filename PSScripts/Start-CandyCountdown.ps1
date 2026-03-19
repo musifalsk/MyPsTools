@@ -3,9 +3,9 @@ param(
 )
 
 # Countdown Until Next Delivery
-$date = Get-Date -Date 11:00:00
+$date = Get-Date -Date 10:00:00 -AsUTC
 for ($i = 0; $i -le 7; $i++) {
-    if (($i -eq 0) -and ((Get-Date) -gt [datetime]::Parse('11:00:00'))) { continue }
+    if (($i -eq 0) -and ((Get-Date -AsUTC) -gt [datetime]::Parse('10:00:00'))) { continue }
     if (($date.AddDays($i).DayOfWeek -eq 'Friday')) {
         $nextFriday = $date.AddDays($i)
         break
