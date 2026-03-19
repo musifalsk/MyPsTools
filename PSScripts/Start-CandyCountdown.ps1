@@ -2,17 +2,21 @@ param(
     [string]$Webhook
 )
 
+# Calculate UTC
+$tzOslo = Get-TimeZone -Id 'Europe/Oslo'
+$timeOslo = (Get-Date -Date 11:00:00)
+$timeUtc = [System.TimeZoneInfo]::ConvertTimeToUtc($timeOslo, $tzOslo)
+
 # Countdown Until Next Delivery
-$date = Get-Date -Date 10:00:00 -AsUTC
 for ($i = 0; $i -le 7; $i++) {
-    if (($i -eq 0) -and ((Get-Date -AsUTC) -gt [datetime]::Parse('10:00:00'))) { continue }
-    if (($date.AddDays($i).DayOfWeek -eq 'Friday')) {
-        $nextFriday = $date.AddDays($i)
+    if (($i -eq 0) -and ((Get-Date -AsUTC) -gt [datetime]::Parse($timeUtc.TimeOfDay))) { continue }
+    if (($timeUtc.AddDays($i).DayOfWeek -eq 'Friday')) {
+        $nextFriday = $timeUtc.AddDays($i)
         break
     }
 }
-$span = New-TimeSpan -Start (Get-Date) -End $nextFriday
-if ($span -gt [timespan]::new(6, 21, 0, 0)) {
+$span = New-TimeSpan -Start (Get-Date -AsUTC) -End $nextFriday
+if ($span -gt [timespan]::new(6, 22, 0, 0)) {
     $msg = 'Hurra!! Det er godteritid 🎉🍬🍭😊'
 }
 else {
