@@ -1,0 +1,6 @@
+
+
+.local/
+.vscode/
+cs/**/bin
+cs/**/obj
