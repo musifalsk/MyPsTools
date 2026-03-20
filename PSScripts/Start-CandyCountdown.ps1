@@ -29,16 +29,18 @@ else {
 }
 Write-Output $msg
 
-$json = @{
-    blocks = @(
-        @{
-            type = 'section'
-            text = @{
-                type  = 'plain_text'
-                text  = $msg
-                emoji = $true
+if ($Webhook) {
+    $json = @{
+        blocks = @(
+            @{
+                type = 'section'
+                text = @{
+                    type  = 'plain_text'
+                    text  = $msg
+                    emoji = $true
+                }
             }
-        }
-    )
-} | ConvertTo-Json -Depth 3
-Invoke-RestMethod -Uri $Webhook -Method Post -Body $json -ContentType 'application/json'
+        )
+    } | ConvertTo-Json -Depth 3
+    Invoke-RestMethod -Uri $Webhook -Method Post -Body $json -ContentType 'application/json'
+}
