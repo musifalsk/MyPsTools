@@ -3,7 +3,7 @@ name: Candy Countdown
 on:
   workflow_dispatch:
   schedule:
-    - cron: "0 9,10,11 * * 1-5"
+    - cron: "0 9,10,11,12 * * 1-5"
 
 jobs:
   build:
