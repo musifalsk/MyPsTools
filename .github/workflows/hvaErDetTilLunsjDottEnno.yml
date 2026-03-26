@@ -1,0 +1,15 @@
+name: hvaErDetTilLunsjDottEnno
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 8 * * 1-5"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run a PS script
+        shell: pwsh
+        run: ./PSScripts/Get-DailyLunch.ps1 -Webhook "${{ secrets.WEBHOOK_3DE }}"
