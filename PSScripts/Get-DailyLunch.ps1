@@ -8,6 +8,13 @@ $menu = $response.Content | ConvertFrom-Json
 if (!($response)) { throw }
 $today = [int](Get-Date).DayOfWeek - 1
 
+if ($($menu.days[$today].dishes) -match 'fisk|torsk|sei|laks') {
+    $title = 'Advarsel - Æææsj!!! Pass på hva du spiser i kantina i dag 🤮🐟'
+}
+else {
+    $title = 'mmmm.. I dag serveres dette i kantina 😋'
+}
+
 if ($Webhook) {
     $json = @{
         'blocks' = @(
@@ -15,7 +22,7 @@ if ($Webhook) {
                 'type' = 'section'
                 'text' = @{
                     'type'  = 'plain_text'
-                    'text'  = 'mmmm.. I dag serveres dette i kantina 😋'
+                    'text'  = $title
                     'emoji' = $true
                 }
             },
