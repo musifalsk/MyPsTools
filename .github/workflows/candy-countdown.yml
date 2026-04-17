@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
   schedule:
     - cron: "0 10 * * 1-4"
-    - cron: "0 7,8,9,10,11,12 * * 5"
+    - cron: "0 6,7,8,9,10,11,12 * * 5"
 
 jobs:
   build:
@@ -14,4 +14,4 @@ jobs:
       - uses: actions/checkout@v4
       - name: Run a PS script
         shell: pwsh
-        run: ./PSScripts/Start-CandyCountdown.ps1 -Webhook "${{ secrets.webhook }}"
+        run: ./PSScripts/Start-CandyCountdown.ps1 -Webhook "${{ secrets.WEBHOOK_3DE }}"
